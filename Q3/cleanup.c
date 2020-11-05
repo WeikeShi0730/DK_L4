@@ -38,7 +38,7 @@ cleanup (Simulation_Run_Ptr simulation_run)
   data = (Simulation_Run_Data_Ptr) simulation_run_data(simulation_run);
 
   /* Clean out the stations. */
-  for(i=0; i<NUMBER_OF_STATIONS; i++) {
+  for(i=0; i<data->number_of_stations; i++) {
     while (fifoqueue_size((data->stations+i)->buffer) > 0) {
       xfree(fifoqueue_get((data->stations+i)->buffer));
     }
