@@ -79,6 +79,7 @@ typedef struct _simulation_run_data_
   double accumulated_delay;
   unsigned random_seed;
 
+  double arrival_rate;
   double packet_backoff_duration;
   int number_of_stations;
 } Simulation_Run_Data, *Simulation_Run_Data_Ptr;

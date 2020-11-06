@@ -86,7 +86,7 @@ packet_arrival_event(Simulation_Run_Ptr simulation_run, void* dummy_ptr)
 
   /* Schedule the next packet arrival. */
   schedule_packet_arrival_event(simulation_run, 
-		now + exponential_generator((double) 1/PACKET_ARRIVAL_RATE));
+		now + exponential_generator((double) 1/data->arrival_rate));
 }
 
 
