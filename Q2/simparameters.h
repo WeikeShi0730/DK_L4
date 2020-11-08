@@ -27,10 +27,10 @@
 
 /*******************************************************************************/
 
-#define NUMBER_OF_STATIONS 10, 10, 10, 5, 5, 5
+#define NUMBER_OF_STATIONS 10, 10
 #define MEAN_PACKET_DURATION 1      /* normalized packet Tx time */
-#define PACKET_ARRIVAL_RATE 0.1, 0.2, 0.3    /* packets per Tx time */
-#define MEAN_BACKOFF_DURATION 5, 10, 20, 3, 5, 7   /* in units of packet transmit time, Tx */
+#define PACKET_ARRIVAL_RATE 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.095, 0.099 /* packets per Tx time */
+#define MEAN_BACKOFF_DURATION 5, 10   /* in units of packet transmit time, Tx */
 #define RUNLENGTH 70000
 #define BLIPRATE 100000
 
@@ -40,9 +40,3 @@
 /*******************************************************************************/
 
 #endif /* simparameters.h */
-
-
-
-
-
-
