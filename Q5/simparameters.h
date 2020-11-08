@@ -25,8 +25,24 @@
 #ifndef _SIMPARAMETERS_H_
 #define _SIMPARAMETERS_H_
 
+#define SMALL_TIME 1
+#define FAST_RUN
+
 /*******************************************************************************/
 
+#ifdef FAST_RUN
+
+#define NUMBER_OF_STATIONS 10
+#define MEAN_PACKET_DURATION 1      /* normalized packet Tx time */
+#define PACKET_ARRIVAL_RATE 0.1    /* packets per Tx time */
+#define MEAN_BACKOFF_DURATION 5   /* in units of packet transmit time, Tx */
+#define RUNLENGTH 70
+#define BLIPRATE 100000
+
+/* Comma separated list of random seeds to run. */
+#define RANDOM_SEED_LIST 400050636
+
+#else
 #define NUMBER_OF_STATIONS 10, 10, 10, 5, 5, 5
 #define MEAN_PACKET_DURATION 1      /* normalized packet Tx time */
 #define PACKET_ARRIVAL_RATE 0.1, 0.2, 0.3    /* packets per Tx time */
@@ -36,6 +52,8 @@
 
 /* Comma separated list of random seeds to run. */
 #define RANDOM_SEED_LIST 400050636, 400099173, 345
+
+#endif //FAST_RUN
 
 /*******************************************************************************/
 

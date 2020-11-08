@@ -78,6 +78,7 @@ typedef struct _simulation_run_data_
   long int number_of_collisions;
   double accumulated_delay;
   unsigned random_seed;
+  double current_slot_end_time;
 
   double arrival_rate;
   double packet_backoff_duration;
