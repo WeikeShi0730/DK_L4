@@ -79,6 +79,8 @@ typedef struct _simulation_run_data_
   int number_of_stations;
   double init_time;
   double end_time;
+  double tpt;
+  double g;
 } Simulation_Run_Data, * Simulation_Run_Data_Ptr;
 
 /**********************************************************************/

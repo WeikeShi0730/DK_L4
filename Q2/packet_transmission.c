@@ -164,7 +164,7 @@ transmission_end_event(Simulation_Run_Ptr simulation_run, void * packet)
     if(get_transmitting_stn_count(channel) == 0) {
       set_channel_state(channel, IDLE);
     }
-
+    
     backoff_duration = 2.0*uniform_generator() * data->packet_backoff_duration;
     schedule_transmission_start_event(simulation_run,
 				      now + backoff_duration,
