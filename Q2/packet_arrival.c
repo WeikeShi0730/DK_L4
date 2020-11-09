@@ -60,6 +60,10 @@ packet_arrival_event(Simulation_Run_Ptr simulation_run, void* dummy_ptr)
   data = (Simulation_Run_Data_Ptr) simulation_run_data(simulation_run);
   data->arrival_count++;
 
+  if(data->init_time == 0){
+    data->init_time = now;
+  }
+
   /* Randomly pick the station that this packet is arriving to. Note
      that randomly splitting a Poisson process creates multiple
      independent Poisson processes.*/
@@ -88,6 +92,3 @@ packet_arrival_event(Simulation_Run_Ptr simulation_run, void* dummy_ptr)
   schedule_packet_arrival_event(simulation_run, 
 		now + exponential_generator((double) 1/data->arrival_rate));
 }
-
-
-

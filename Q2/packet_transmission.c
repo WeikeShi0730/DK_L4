@@ -125,6 +125,7 @@ transmission_end_event(Simulation_Run_Ptr simulation_run, void * packet)
 
     /* Collect statistics. */
     data->number_of_packets_processed++;
+    data->end_time = now;
 
     (data->stations+this_packet->station_id)->packet_count++;
     (data->stations+this_packet->station_id)->accumulated_delay +=
@@ -165,7 +166,6 @@ transmission_end_event(Simulation_Run_Ptr simulation_run, void * packet)
     }
 
     backoff_duration = 2.0*uniform_generator() * data->packet_backoff_duration;
-
     schedule_transmission_start_event(simulation_run,
 				      now + backoff_duration,
 				      (void *) this_packet);

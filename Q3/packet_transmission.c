@@ -125,6 +125,7 @@ transmission_end_event(Simulation_Run_Ptr simulation_run, void * packet)
 
     /* Collect statistics. */
     data->number_of_packets_processed++;
+    data->end_time = now;
 
     (data->stations+this_packet->station_id)->packet_count++;
     (data->stations+this_packet->station_id)->accumulated_delay +=
