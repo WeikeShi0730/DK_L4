@@ -68,6 +68,9 @@ packet_arrival_event(Simulation_Run_Ptr simulation_run, void* dummy_ptr)
   Buffer_Ptr stn_buffer;
   Time now;
   Simulation_Run_Data_Ptr data;
+  double current_slot_end_time;
+  double current_slot_start_time;
+  double packet_duration;
 
   now = simulation_run_get_time(simulation_run);
 
@@ -93,9 +96,27 @@ packet_arrival_event(Simulation_Run_Ptr simulation_run, void* dummy_ptr)
 
   /* If this is the only packet at the station, transmit it (i.e., the
      ALOHA protocol). It stays in the queue either way. */
+  current_slot_end_time = data->current_slot_end_time; 
+  packet_duration = get_packet_duration();
+  current_slot_start_time = current_slot_end_time - get_packet_duration() - SMALL_TIME * 2; 
+
   if(fifoqueue_size(stn_buffer) == 1) {
-    /* Transmit the packet. */
-    schedule_transmission_start_event(simulation_run, now, (void *) new_packet);
+      if (now <= current_slot_end_time && now > current_slot_start_time + SMALL_TIME)
+      {
+        TRACE(printf("outside slot current_slot_end_time = %f\n", current_slot_end_time););
+        /* Transmit the packet. */
+        schedule_transmission_start_event(simulation_run, current_slot_end_time + SMALL_TIME, (void *) new_packet);
+      }
+      else if (now <= current_slot_start_time + SMALL_TIME && now >= current_slot_start_time)
+      {
+        TRACE(printf("within slot current_slot_end_time = %f\n", current_slot_end_time););
+        schedule_transmission_start_event(simulation_run, current_slot_start_time + SMALL_TIME, (void *) new_packet);
+
+      }
+      else
+      {
+        TRACE(printf("Unknown case \n"););
+      }
   }
 
 #ifdef D_Arrival
