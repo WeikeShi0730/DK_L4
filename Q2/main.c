@@ -184,6 +184,7 @@ int main(void)
       printf("Mean Backoff duration = %f \n", MEAN_BACKOFF_DURATION_LIST[l]);
       printf("Throughput = %f \n", for_avg_acc.number_of_packets_processed / (for_avg_acc.end_time - for_avg_acc.init_time));
       printf("Mean Delay = %f \n", (double)for_avg_acc.accumulated_delay / for_avg_acc.number_of_packets_processed);
+      printf("number_of_collisions = %d \n", for_avg_acc.number_of_collisions);
       printf("\n");
     }
   }
