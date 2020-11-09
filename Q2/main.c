@@ -141,7 +141,7 @@ int main(void)
         }
         data.tpt = (double)data.number_of_packets_processed / (data.end_time - data.init_time);
         data.g = (double)(data.arrival_count + data.number_of_collisions) / (data.end_time - data.init_time);
-
+        
         for_avg_acc.arrival_count += data.arrival_count;
         for_avg_acc.number_of_packets_processed += data.number_of_packets_processed;
         for_avg_acc.number_of_collisions += data.number_of_collisions;
@@ -201,6 +201,8 @@ int main(void)
       printf("Packet duration = %d \n", MEAN_PACKET_DURATION);
       printf("Mean Backoff duration = %f \n", MEAN_BACKOFF_DURATION_LIST[l]);
       printf("Throughput = %f \n", for_avg_acc.tpt);
+      printf("theo_throughput= %f \n", for_avg_acc.g * exp(-2*for_avg_acc.g));
+      printf("number of arrivals = %ld \n", for_avg_acc.arrival_count);
       printf("number of collision = %d \n", for_avg_acc.number_of_collisions);
       printf("Mean Delay = %f \n", (double)for_avg_acc.accumulated_delay / for_avg_acc.number_of_packets_processed);
       printf("number_of_collisions = %d \n", for_avg_acc.number_of_collisions);
