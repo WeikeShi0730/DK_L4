@@ -63,7 +63,6 @@ transmission_start_event(Simulation_Run_Ptr simulation_run, void * ptr)
   this_packet = (Packet_Ptr) ptr;
   data = (Simulation_Run_Data_Ptr) simulation_run_data(simulation_run);
   channel = data->channel;
-  data->G++;
   current_slot_end_time = data->current_slot_end_time; 
   packet_duration = get_packet_duration();
   current_slot_start_time = current_slot_end_time - get_packet_duration() - SMALL_TIME * 2; 
@@ -135,8 +134,8 @@ transmission_end_event(Simulation_Run_Ptr simulation_run, void * packet)
   data = (Simulation_Run_Data_Ptr) simulation_run_data(simulation_run);
   channel = data->channel;
 
-
   now = simulation_run_get_time(simulation_run);
+  data->sim_time = now;
 
   this_packet = (Packet_Ptr) packet;
   buffer = (data->stations+this_packet->station_id)->buffer;

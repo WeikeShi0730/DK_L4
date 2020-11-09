@@ -71,10 +71,13 @@ int main(void)
     for (int k = 0; k < (sizeof(PACKET_ARRIVAL_RATE_LIST) / sizeof(double)); k++)
     {
       //printf("%f", MEAN_BACKOFF_DURATION_LIST[k + l * 3]);
+      for_avg_acc.sim_time = 0;
+      for_avg_acc.throughput = 0;
+      for_avg_acc.mean_delay = 0;
+      for_avg_acc.G_per_X = 0;
       for_avg_acc.arrival_count = 0;
       for_avg_acc.blip_counter = 0;
       for_avg_acc.packets_processed = 0;
-      for_avg_acc.G = 0;
       for_avg_acc.number_of_packets_processed = 0;
       for_avg_acc.number_of_collisions = 0;
       for_avg_acc.accumulated_delay = 0;
@@ -97,10 +100,13 @@ int main(void)
         TRACE(printf("main get_packet_duration = %f\n", get_packet_duration()););
         TRACE(printf("main SMALL_TIME = %f\n", SMALL_TIME););
         TRACE(printf("main current_slot_end_time = %f\n", data.current_slot_end_time););
+        data.sim_time = 0;
+        data.throughput = 0;
+        data.mean_delay = 0;
+        data.G_per_X = 0;
         data.arrival_count = 0;
         data.blip_counter = 0;
         data.packets_processed = 0;
-        data.G = 0;
         data.number_of_packets_processed = 0;
         data.number_of_collisions = 0;
         data.accumulated_delay = 0;
@@ -136,10 +142,13 @@ int main(void)
           simulation_run_execute_event(simulation_run);
         }
 
+        for_avg_acc.sim_time += data.sim_time;
+        for_avg_acc.throughput += (data.number_of_packets_processed/data.sim_time * get_packet_duration());
+        for_avg_acc.mean_delay += (data.accumulated_delay/data.sim_time * get_packet_duration());
+        for_avg_acc.G_per_X += ((data.number_of_collisions + data.arrival_count)/data.sim_time * get_packet_duration());
         for_avg_acc.arrival_count += data.arrival_count;
         for_avg_acc.blip_counter += data.blip_counter;
         for_avg_acc.packets_processed += data.packets_processed;
-        for_avg_acc.G += data.G;
         for_avg_acc.number_of_packets_processed += data.number_of_packets_processed;
         for_avg_acc.number_of_collisions += data.number_of_collisions;
         for_avg_acc.accumulated_delay += data.accumulated_delay;
@@ -151,10 +160,13 @@ int main(void)
         cleanup(simulation_run);
       } // end while
 
+      for_avg_acc.sim_time /= size_rand_seed;
+      for_avg_acc.throughput /= size_rand_seed;
+      for_avg_acc.mean_delay /= size_rand_seed;
+      for_avg_acc.G_per_X /= size_rand_seed;
       for_avg_acc.arrival_count /= size_rand_seed;
       for_avg_acc.blip_counter /= size_rand_seed;
       for_avg_acc.packets_processed /= size_rand_seed;
-      for_avg_acc.G /= size_rand_seed;
       for_avg_acc.number_of_packets_processed /= size_rand_seed;
       for_avg_acc.number_of_collisions /= size_rand_seed;
       for_avg_acc.accumulated_delay /= size_rand_seed;
@@ -185,11 +197,16 @@ int main(void)
       printf("Number of Stations = %d \n", NUMBER_OF_STATIONS_LIST[l]);
       printf("Packet Arrival Rate = %f \n", PACKET_ARRIVAL_RATE_LIST[k]);
       printf("Mean Backoff duration = %f \n", MEAN_BACKOFF_DURATION_LIST[l]);
-      printf("Mean Delay = %f \n", (double)for_avg_acc.accumulated_delay / for_avg_acc.number_of_packets_processed);
+      printf("accumulated_delay = %f \n", (double)for_avg_acc.accumulated_delay);
       printf("number_of_packets_processed = %d \n", for_avg_acc.number_of_packets_processed);
       printf("packets_processed = %d \n", for_avg_acc.packets_processed);
-      printf("G = %d \n", for_avg_acc.G);
+      printf("arrival_count = %d \n", for_avg_acc.arrival_count);
       printf("number_of_collisions = %d \n", for_avg_acc.number_of_collisions);
+      printf("sim_time = %f \n", for_avg_acc.sim_time);
+      printf("throughput = %f \n", for_avg_acc.throughput);
+      printf("mean_delay = %f \n", for_avg_acc.mean_delay);
+      printf("G_per_X = %f \n", for_avg_acc.G_per_X);
+      printf("theo_throughput= %f \n", for_avg_acc.G_per_X * exp(-1*for_avg_acc.G_per_X));
       printf("\n");
     }
   }
