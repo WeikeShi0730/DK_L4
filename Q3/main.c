@@ -163,7 +163,7 @@ int main(void)
       fprintf(fp, "%d, ", NUMBER_OF_STATIONS_LIST[l]);
 
       //fprintf(fp, ("Mean Packet Duration"));
-      fprintf(fp, "%f, ", MEAN_PACKET_DURATION);
+      fprintf(fp, "%d, ", MEAN_PACKET_DURATION);
 
       //fprintf(fp, ("Packet Arrival Rate"));
       fprintf(fp, "%f, ", PACKET_ARRIVAL_RATE_LIST[k]);
@@ -182,6 +182,8 @@ int main(void)
       printf("Number of Stations = %d \n", NUMBER_OF_STATIONS_LIST[l]);
       printf("Packet Arrival Rate = %f \n", PACKET_ARRIVAL_RATE_LIST[k]);
       printf("Throughput = %f \n", for_avg_acc.number_of_packets_processed / (for_avg_acc.end_time - for_avg_acc.init_time));
+      printf("number of collision = %d \n", for_avg_acc.number_of_collisions);
+      printf("total time = %f \n", (for_avg_acc.end_time - for_avg_acc.init_time));
       printf("Mean Delay = %f \n", (double)for_avg_acc.accumulated_delay / for_avg_acc.number_of_packets_processed);
       printf("\n");
     }

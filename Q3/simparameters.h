@@ -31,7 +31,7 @@
 #define MEAN_PACKET_DURATION 1      /* normalized packet Tx time */
 #define PACKET_ARRIVAL_RATE 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 1, 5, 10    /* packets per Tx time */
 //#define MEAN_BACKOFF_DURATION 5, 10, 20, 3, 5, 7   /* in units of packet transmit time, Tx */
-#define RUNLENGTH 70000
+#define RUNLENGTH 7
 #define BLIPRATE 100000
 
 /* Comma separated list of random seeds to run. */
