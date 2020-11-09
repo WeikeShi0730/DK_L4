@@ -45,6 +45,20 @@ schedule_packet_arrival_event(Simulation_Run_Ptr simulation_run,
 
 /*******************************************************************************/
 
+long int
+schedule_slot_event(Simulation_Run_Ptr simulation_run,
+			      Time event_time)
+{
+  Event event;
+
+  event.description = "Slot ";
+  event.function = slot_event;
+  event.attachment = NULL;
+
+  return simulation_run_schedule_event(simulation_run, event, event_time);
+}
+
+/*******************************************************************************/
 void
 packet_arrival_event(Simulation_Run_Ptr simulation_run, void* dummy_ptr) 
 {
@@ -84,10 +98,27 @@ packet_arrival_event(Simulation_Run_Ptr simulation_run, void* dummy_ptr)
     schedule_transmission_start_event(simulation_run, now, (void *) new_packet);
   }
 
+#ifdef D_Arrival
   /* Schedule the next packet arrival. */
-  schedule_packet_arrival_event(simulation_run, 
-		now + exponential_generator((double) 1/data->arrival_rate));
+  schedule_packet_arrival_event(simulation_run, now + (double) 1/data->arrival_rate);
+#else
+  /* Schedule the next packet arrival. */
+  schedule_packet_arrival_event(simulation_run, now + exponential_generator((double) 1/data->arrival_rate));
+#endif
 }
 
+void
+slot_event(Simulation_Run_Ptr simulation_run, void* dummy_ptr) 
+{
+  Time now;
+  Simulation_Run_Data_Ptr data;
+
+  now = simulation_run_get_time(simulation_run);
+
+  data = (Simulation_Run_Data_Ptr) simulation_run_data(simulation_run);
+  data->current_slot_end_time = now + get_packet_duration() + 2 * SMALL_TIME;
+
+  schedule_slot_event(simulation_run, data->current_slot_end_time);
+}
 
 

@@ -33,6 +33,7 @@
 #include "packet_transmission.h"
 #include "main.h"
 
+#include "packet_duration.h"
 /*******************************************************************************/
 
 int main(void)
@@ -51,7 +52,7 @@ int main(void)
 
   // create a csv file
   FILE *fp;
-  char data_set_name[] = "./Q2.csv";
+  char data_set_name[] = "./Q5.csv";
   //file IO
 
   fp = fopen(data_set_name, "w");
@@ -73,6 +74,7 @@ int main(void)
       for_avg_acc.arrival_count = 0;
       for_avg_acc.blip_counter = 0;
       for_avg_acc.packets_processed = 0;
+      for_avg_acc.G = 0;
       for_avg_acc.number_of_packets_processed = 0;
       for_avg_acc.number_of_collisions = 0;
       for_avg_acc.accumulated_delay = 0;
@@ -91,9 +93,14 @@ int main(void)
         /* Add our data definitions to the simulation_run. */
         simulation_run_set_data(simulation_run, (void *)&data);
 
+        data.current_slot_end_time = 0;
+        TRACE(printf("main get_packet_duration = %f\n", get_packet_duration()););
+        TRACE(printf("main SMALL_TIME = %f\n", SMALL_TIME););
+        TRACE(printf("main current_slot_end_time = %f\n", data.current_slot_end_time););
         data.arrival_count = 0;
         data.blip_counter = 0;
         data.packets_processed = 0;
+        data.G = 0;
         data.number_of_packets_processed = 0;
         data.number_of_collisions = 0;
         data.accumulated_delay = 0;
@@ -120,9 +127,8 @@ int main(void)
         data.channel = channel_new();
 
         /* Schedule initial packet arrival. */
-        schedule_packet_arrival_event(simulation_run,
-                                      simulation_run_get_time(simulation_run) +
-                                          exponential_generator((double)1 / PACKET_ARRIVAL_RATE_LIST[k]));
+        schedule_packet_arrival_event(simulation_run, simulation_run_get_time(simulation_run) + exponential_generator((double)1 / PACKET_ARRIVAL_RATE_LIST[k]));
+        schedule_slot_event(simulation_run, simulation_run_get_time(simulation_run));
 
         /* Execute events until we are finished. */
         while (data.number_of_packets_processed < RUNLENGTH)
@@ -133,6 +139,7 @@ int main(void)
         for_avg_acc.arrival_count += data.arrival_count;
         for_avg_acc.blip_counter += data.blip_counter;
         for_avg_acc.packets_processed += data.packets_processed;
+        for_avg_acc.G += data.G;
         for_avg_acc.number_of_packets_processed += data.number_of_packets_processed;
         for_avg_acc.number_of_collisions += data.number_of_collisions;
         for_avg_acc.accumulated_delay += data.accumulated_delay;
@@ -147,6 +154,7 @@ int main(void)
       for_avg_acc.arrival_count /= size_rand_seed;
       for_avg_acc.blip_counter /= size_rand_seed;
       for_avg_acc.packets_processed /= size_rand_seed;
+      for_avg_acc.G /= size_rand_seed;
       for_avg_acc.number_of_packets_processed /= size_rand_seed;
       for_avg_acc.number_of_collisions /= size_rand_seed;
       for_avg_acc.accumulated_delay /= size_rand_seed;
@@ -178,6 +186,10 @@ int main(void)
       printf("Packet Arrival Rate = %f \n", PACKET_ARRIVAL_RATE_LIST[k]);
       printf("Mean Backoff duration = %f \n", MEAN_BACKOFF_DURATION_LIST[l]);
       printf("Mean Delay = %f \n", (double)for_avg_acc.accumulated_delay / for_avg_acc.number_of_packets_processed);
+      printf("number_of_packets_processed = %d \n", for_avg_acc.number_of_packets_processed);
+      printf("packets_processed = %d \n", for_avg_acc.packets_processed);
+      printf("G = %d \n", for_avg_acc.G);
+      printf("number_of_collisions = %d \n", for_avg_acc.number_of_collisions);
       printf("\n");
     }
   }

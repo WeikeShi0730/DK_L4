@@ -29,6 +29,7 @@
 #include "channel.h"
 #include "packet_transmission.h"
 
+#include "packet_duration.h"
 /*******************************************************************************/
 
 long int
@@ -53,28 +54,53 @@ transmission_start_event(Simulation_Run_Ptr simulation_run, void * ptr)
   Packet_Ptr this_packet;
   Simulation_Run_Data_Ptr data;
   Channel_Ptr channel;
+  Time backoff_duration, now;
+  double current_slot_end_time;
+  double current_slot_start_time;
+  double packet_duration;
 
+  now = simulation_run_get_time(simulation_run);
   this_packet = (Packet_Ptr) ptr;
   data = (Simulation_Run_Data_Ptr) simulation_run_data(simulation_run);
   channel = data->channel;
+  data->G++;
+  current_slot_end_time = data->current_slot_end_time; 
+  packet_duration = get_packet_duration();
+  current_slot_start_time = current_slot_end_time - get_packet_duration() - SMALL_TIME * 2; 
 
-  /* This packet is starting to transmit. */
-  increment_transmitting_stn_count(channel);
-  this_packet->status = TRANSMITTING;
+    TRACE(printf("start event current_slot_end_time = %f\n", current_slot_end_time););
 
-  if(get_channel_state(channel) != IDLE) {
+  if (now <= current_slot_end_time && now > current_slot_start_time + SMALL_TIME)
+  {
+
+    schedule_transmission_start_event(simulation_run, current_slot_end_time + uniform_generator()/100000.0, (void *) this_packet);
+
+  }
+  else if (now <= current_slot_start_time + SMALL_TIME && now >= current_slot_start_time)
+  {
+
+    /* This packet is starting to transmit. */
+    increment_transmitting_stn_count(channel);
+    this_packet->status = TRANSMITTING;
+
+    if(get_channel_state(channel) != IDLE) {
     /* The channel is now colliding. */
     set_channel_state(channel, COLLISION);
-  } else {
+    } else {
     /* The channel is successful, for now. */
     set_channel_state(channel, SUCCESS);
-  }
+    }
 
-  /* Schedule the end of packet transmission event. */
-  schedule_transmission_end_event(simulation_run,
-				  simulation_run_get_time(simulation_run) + 
-				  this_packet->service_time,
-				  (void *) this_packet);
+    /* Schedule the end of packet transmission event. */
+    schedule_transmission_end_event(simulation_run,
+                  simulation_run_get_time(simulation_run) + 
+                  this_packet->service_time,
+                  (void *) this_packet);
+  }
+  else
+  {
+    TRACE(printf("Unknown case \n"););
+  }
 }
 
 /*******************************************************************************/
@@ -103,9 +129,12 @@ transmission_end_event(Simulation_Run_Ptr simulation_run, void * packet)
   Time backoff_duration, now;
   Simulation_Run_Data_Ptr data;
   Channel_Ptr channel;
+  int num_of_slots;
+  double back_time;
 
   data = (Simulation_Run_Data_Ptr) simulation_run_data(simulation_run);
   channel = data->channel;
+
 
   now = simulation_run_get_time(simulation_run);
 
@@ -115,12 +144,14 @@ transmission_end_event(Simulation_Run_Ptr simulation_run, void * packet)
   /* This station has stopped transmitting. */
   decrement_transmitting_stn_count(channel);
 
+    TRACE(printf("end event current_slot_end_time = %f\n", data->current_slot_end_time););
   /* Check if the packet was successful. */
   if(get_channel_state(channel) == SUCCESS) {
 
     /* Transmission was a success. The channel is now IDLE. */
     set_channel_state(channel, IDLE);
     
+    data->current_slot_end_time = now + SMALL_TIME;
     TRACE(printf("Success.\n"););
 
     /* Collect statistics. */
@@ -143,9 +174,7 @@ transmission_end_event(Simulation_Run_Ptr simulation_run, void * packet)
     if(fifoqueue_size(buffer) > 0) {
       next_packet = fifoqueue_see_front(buffer);
 
-      schedule_transmission_start_event(simulation_run,
-					now,
-					(void*) next_packet);
+      schedule_transmission_start_event(simulation_run, now, (void*) next_packet);
     }
 
   } else {
@@ -166,9 +195,21 @@ transmission_end_event(Simulation_Run_Ptr simulation_run, void * packet)
 
     backoff_duration = 2.0*uniform_generator() * data->packet_backoff_duration;
 
-    schedule_transmission_start_event(simulation_run,
-				      now + backoff_duration,
-				      (void *) this_packet);
+    num_of_slots = round(backoff_duration / get_packet_duration());
+
+    //because it is the last one, we already update it
+   if(get_transmitting_stn_count(channel) == 0)
+    {
+        back_time = data->current_slot_end_time + num_of_slots * (get_packet_duration() + 2 * SMALL_TIME);
+        schedule_transmission_start_event(simulation_run, back_time, (void *) this_packet);
+
+    }
+    else
+    {
+        back_time = data->current_slot_end_time + (num_of_slots + 1) * (get_packet_duration() + 2 * SMALL_TIME);
+        schedule_transmission_start_event(simulation_run, back_time, (void *) this_packet);
+
+    }
   }
 
 }
