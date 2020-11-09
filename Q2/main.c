@@ -205,6 +205,7 @@ int main(void)
       printf("number of arrivals = %ld \n", for_avg_acc.arrival_count);
       printf("number of collision = %d \n", for_avg_acc.number_of_collisions);
       printf("Mean Delay = %f \n", (double)for_avg_acc.accumulated_delay / for_avg_acc.number_of_packets_processed);
+      printf("number_of_collisions = %d \n", for_avg_acc.number_of_collisions);
       printf("\n");
     }
   }
