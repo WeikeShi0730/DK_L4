@@ -35,8 +35,7 @@
 
 /*******************************************************************************/
 
-int
-main(void)
+int main(void)
 {
   /* Get the list of random number generator seeds defined in simparameters.h */
   unsigned random_seed;
@@ -71,23 +70,27 @@ main(void)
   {
     for (int k = 0; k < (sizeof(PACKET_ARRIVAL_RATE_LIST) / sizeof(double)); k++)
     {
+      /* Initialize various average simulation_run variables. */
+      for_avg_acc.arrival_count = 0;
+      for_avg_acc.blip_counter = 0;
+      for_avg_acc.number_of_packets_processed = 0;
+      for_avg_acc.number_of_collisions = 0;
+      for_avg_acc.accumulated_delay = 0;
+      for_avg_acc.init_time = 0;
+      for_avg_acc.end_time = 0;
       int j = 0;
       /* Do a new simulation_run for each random number generator seed. */
-      while ((random_seed = RANDOM_SEEDS[j++]) != 0) {
-
+      while ((random_seed = RANDOM_SEEDS[j++]) != 0)
+      {
         /* Set the random generator seed. */
         random_generator_initialize(random_seed);
 
         /* Create a new simulation_run. This gives a clock and
           eventlist. Clock time is set to zero. */
-        simulation_run = (Simulation_Run_Ptr) simulation_run_new();
+        simulation_run = (Simulation_Run_Ptr)simulation_run_new();
 
         /* Add our data definitions to the simulation_run. */
-        simulation_run_set_data(simulation_run, (void *) & data);
-
-        /* Create and initalize the stations. */
-        data.stations = (Station_Ptr) xcalloc((unsigned int) NUMBER_OF_STATIONS_LIST[l],
-                sizeof(Station));
+        simulation_run_set_data(simulation_run, (void *)&data);
 
         /* Initialize various simulation_run variables. */
         data.arrival_count = 0;
@@ -101,41 +104,48 @@ main(void)
         data.init_time = 0;
         data.end_time = 0;
         data.random_seed = random_seed;
-        
+
+        /* Create and initalize the stations. */
+        data.stations = (Station_Ptr)xcalloc((unsigned int)NUMBER_OF_STATIONS_LIST[l],
+                                             sizeof(Station));
+
         /* Initialize the stations. */
-        for(int i=0; i<NUMBER_OF_STATIONS_LIST[l]; i++) {
-          (data.stations+i)->id = i;
-          (data.stations+i)->buffer = fifoqueue_new();
-          (data.stations+i)->packet_count = 0;
-          (data.stations+i)->accumulated_delay = 0.0;
-          (data.stations+i)->mean_delay = 0;
+        for (int i = 0; i < NUMBER_OF_STATIONS_LIST[l]; i++)
+        {
+          (data.stations + i)->id = i;
+          (data.stations + i)->buffer = fifoqueue_new();
+          (data.stations + i)->packet_count = 0;
+          (data.stations + i)->accumulated_delay = 0.0;
+          (data.stations + i)->mean_delay = 0;
         }
 
         /* Create and initialize the channel. */
         data.channel = channel_new();
 
         /* Schedule initial packet arrival. */
-        schedule_packet_arrival_event(simulation_run, 
-            simulation_run_get_time(simulation_run) +
-            exponential_generator((double) 1/PACKET_ARRIVAL_RATE_LIST[k]));
+        schedule_packet_arrival_event(simulation_run,
+                                      simulation_run_get_time(simulation_run) +
+                                          exponential_generator((double)1 / PACKET_ARRIVAL_RATE_LIST[k]));
 
         /* Execute events until we are finished. */
-        while(data.number_of_packets_processed < RUNLENGTH) {
+        while (data.number_of_packets_processed < RUNLENGTH)
+        {
           simulation_run_execute_event(simulation_run);
         }
+
         for_avg_acc.arrival_count += data.arrival_count;
         for_avg_acc.number_of_packets_processed += data.number_of_packets_processed;
         for_avg_acc.number_of_collisions += data.number_of_collisions;
         for_avg_acc.accumulated_delay += data.accumulated_delay;
         for_avg_acc.init_time += data.init_time;
         for_avg_acc.end_time += data.end_time;
-
         /* Print out some results. */
         //output_results(simulation_run);
 
         /* Clean up memory. */
         cleanup(simulation_run);
       }
+
       for_avg_acc.arrival_count /= size_rand_seed;
       for_avg_acc.number_of_packets_processed /= size_rand_seed;
       for_avg_acc.number_of_collisions /= size_rand_seed;
@@ -156,7 +166,7 @@ main(void)
 
       //fprintf(fp, ("Mean Backoff duration"));
       fprintf(fp, "%f, ", MEAN_BACKOFF_DURATION_LIST[l]);
-      
+
       //fprintf(fp, ("Throughput, "));
       fprintf(fp, "%f, ", (double)for_avg_acc.number_of_packets_processed / (for_avg_acc.end_time - for_avg_acc.init_time));
 
@@ -179,15 +189,3 @@ main(void)
   }
   return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
