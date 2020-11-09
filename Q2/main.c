@@ -60,9 +60,9 @@ int main(void)
   fprintf(fp, ("Number of Stations, "));
   fprintf(fp, ("Mean Packet Duration, "));
   fprintf(fp, ("Packet Arrival Rate, "));
-  fprintf(fp, ("G"));
+  fprintf(fp, ("G, "));
   fprintf(fp, ("Mean Backoff duration, "));
-  fprintf(fp, ("Number of collision"));
+  fprintf(fp, ("Number of collision, "));
   fprintf(fp, ("Throughput, "));
   fprintf(fp, ("Mean Delay, "));
 
@@ -141,7 +141,9 @@ int main(void)
         }
         data.tpt = (double)data.number_of_packets_processed / (data.end_time - data.init_time);
         data.g = (double)(data.arrival_count + data.number_of_collisions) / (data.end_time - data.init_time);
-        
+        printf("start time = %f\n", data.init_time);
+        printf("end time = %f\n", data.end_time);
+        printf("collisions = %d \n\n", data.number_of_collisions);
         for_avg_acc.arrival_count += data.arrival_count;
         for_avg_acc.number_of_packets_processed += data.number_of_packets_processed;
         for_avg_acc.number_of_collisions += data.number_of_collisions;
@@ -176,7 +178,7 @@ int main(void)
       fprintf(fp, "%f, ", PACKET_ARRIVAL_RATE_LIST[k]);
 
       //fprintf(fp, ("G"));
-      fprintf(fp, "%f, ", MEAN_BACKOFF_DURATION_LIST[l]);
+      fprintf(fp, "%f, ", for_avg_acc.g);
 
       //fprintf(fp, ("Mean Backoff duration"));
       fprintf(fp, "%f, ", MEAN_BACKOFF_DURATION_LIST[l]);
@@ -201,11 +203,10 @@ int main(void)
       printf("Packet duration = %d \n", MEAN_PACKET_DURATION);
       printf("Mean Backoff duration = %f \n", MEAN_BACKOFF_DURATION_LIST[l]);
       printf("Throughput = %f \n", for_avg_acc.tpt);
-      printf("theo_throughput= %f \n", for_avg_acc.g * exp(-2*for_avg_acc.g));
+      printf("theo_throughput= %f \n", for_avg_acc.g * exp(-2 * for_avg_acc.g));
       printf("number of arrivals = %ld \n", for_avg_acc.arrival_count);
       printf("number of collision = %d \n", for_avg_acc.number_of_collisions);
       printf("Mean Delay = %f \n", (double)for_avg_acc.accumulated_delay / for_avg_acc.number_of_packets_processed);
-      printf("number_of_collisions = %d \n", for_avg_acc.number_of_collisions);
       printf("\n");
     }
   }
