@@ -45,6 +45,20 @@ schedule_packet_arrival_event(Simulation_Run_Ptr simulation_run,
 
 /*******************************************************************************/
 
+long int
+schedule_slot_event(Simulation_Run_Ptr simulation_run,
+			      Time event_time)
+{
+  Event event;
+
+  event.description = "Slot ";
+  event.function = slot_event;
+  event.attachment = NULL;
+
+  return simulation_run_schedule_event(simulation_run, event, event_time);
+}
+
+/*******************************************************************************/
 void
 packet_arrival_event(Simulation_Run_Ptr simulation_run, void* dummy_ptr) 
 {
@@ -54,6 +68,9 @@ packet_arrival_event(Simulation_Run_Ptr simulation_run, void* dummy_ptr)
   Buffer_Ptr stn_buffer;
   Time now;
   Simulation_Run_Data_Ptr data;
+  double current_slot_end_time;
+  double current_slot_start_time;
+  double packet_duration;
 
   now = simulation_run_get_time(simulation_run);
 
@@ -63,7 +80,7 @@ packet_arrival_event(Simulation_Run_Ptr simulation_run, void* dummy_ptr)
   /* Randomly pick the station that this packet is arriving to. Note
      that randomly splitting a Poisson process creates multiple
      independent Poisson processes.*/
-  random_station_id = (int) floor(uniform_generator()*NUMBER_OF_STATIONS);
+  random_station_id = (int) floor(uniform_generator()*data->number_of_stations);
   station = data->stations + random_station_id;
 
   new_packet = (Packet_Ptr) xmalloc(sizeof(Packet));
@@ -79,15 +96,50 @@ packet_arrival_event(Simulation_Run_Ptr simulation_run, void* dummy_ptr)
 
   /* If this is the only packet at the station, transmit it (i.e., the
      ALOHA protocol). It stays in the queue either way. */
+  current_slot_end_time = data->current_slot_end_time; 
+  packet_duration = get_packet_duration();
+  current_slot_start_time = current_slot_end_time - get_packet_duration() - SMALL_TIME * 2; 
+
   if(fifoqueue_size(stn_buffer) == 1) {
-    /* Transmit the packet. */
-    schedule_transmission_start_event(simulation_run, now, (void *) new_packet);
+      if (now <= current_slot_end_time && now > current_slot_start_time + SMALL_TIME)
+      {
+        TRACE(printf("outside slot current_slot_end_time = %f\n", current_slot_end_time););
+        /* Transmit the packet. */
+        schedule_transmission_start_event(simulation_run, current_slot_end_time + SMALL_TIME, (void *) new_packet);
+      }
+      else if (now <= current_slot_start_time + SMALL_TIME && now >= current_slot_start_time)
+      {
+        TRACE(printf("within slot current_slot_end_time = %f\n", current_slot_end_time););
+        schedule_transmission_start_event(simulation_run, current_slot_start_time + SMALL_TIME, (void *) new_packet);
+
+      }
+      else
+      {
+        TRACE(printf("Unknown case \n"););
+      }
   }
 
+#ifdef D_Arrival
   /* Schedule the next packet arrival. */
-  schedule_packet_arrival_event(simulation_run, 
-		now + exponential_generator((double) 1/PACKET_ARRIVAL_RATE));
+  schedule_packet_arrival_event(simulation_run, now + (double) 1/data->arrival_rate);
+#else
+  /* Schedule the next packet arrival. */
+  schedule_packet_arrival_event(simulation_run, now + exponential_generator((double) 1/data->arrival_rate));
+#endif
 }
 
+void
+slot_event(Simulation_Run_Ptr simulation_run, void* dummy_ptr) 
+{
+  Time now;
+  Simulation_Run_Data_Ptr data;
+
+  now = simulation_run_get_time(simulation_run);
+
+  data = (Simulation_Run_Data_Ptr) simulation_run_data(simulation_run);
+  data->current_slot_end_time = now + get_packet_duration() + 2 * SMALL_TIME;
+
+  schedule_slot_event(simulation_run, data->current_slot_end_time);
+}
 
 
