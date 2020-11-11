@@ -59,24 +59,28 @@ int main(void)
   fprintf(fp, ("Number of Stations, "));
   fprintf(fp, ("Mean Packet Duration, "));
   fprintf(fp, ("Packet Arrival Rate, "));
+  fprintf(fp, ("G, "));
+  fprintf(fp, ("Number of collision, "));
   fprintf(fp, ("Throughput, "));
   fprintf(fp, ("Mean Delay, "));
 
   fprintf(fp, "\n");
   fclose(fp);
-  for (int l = 0; l < (sizeof(NUMBER_OF_STATIONS_LIST) / sizeof(unsigned int)); l++)
+  for (int l = 0; l < (sizeof(NUMBER_OF_STATIONS_LIST) / sizeof(int)); l++)
   {
     for (int k = 0; k < (sizeof(PACKET_ARRIVAL_RATE_LIST) / sizeof(double)); k++)
     {
+      /* Initialize various average simulation_run variables. */
       for_avg_acc.arrival_count = 0;
       for_avg_acc.blip_counter = 0;
-      for_avg_acc.packets_processed = 0;
       for_avg_acc.number_of_packets_processed = 0;
       for_avg_acc.number_of_collisions = 0;
       for_avg_acc.accumulated_delay = 0;
       for_avg_acc.init_time = 0;
       for_avg_acc.end_time = 0;
-
+      for_avg_acc.tpt = 0;
+      for_avg_acc.g = 0;
+      
       int j = 0;
       /* Do a new simulation_run for each random number generator seed. */
       while ((random_seed = RANDOM_SEEDS[j++]) != 0)
@@ -85,15 +89,15 @@ int main(void)
         random_generator_initialize(random_seed);
 
         /* Create a new simulation_run. This gives a clock and
-       eventlist. Clock time is set to zero. */
+          eventlist. Clock time is set to zero. */
         simulation_run = (Simulation_Run_Ptr)simulation_run_new();
 
         /* Add our data definitions to the simulation_run. */
         simulation_run_set_data(simulation_run, (void *)&data);
 
+        /* Initialize various simulation_run variables. */
         data.arrival_count = 0;
         data.blip_counter = 0;
-        data.packets_processed = 0;
         data.number_of_packets_processed = 0;
         data.number_of_collisions = 0;
         data.accumulated_delay = 0;
@@ -101,6 +105,8 @@ int main(void)
         data.number_of_stations = NUMBER_OF_STATIONS_LIST[l];
         data.init_time = 0;
         data.end_time = 0;
+        data.tpt = 0;
+        data.g = 0;
         data.random_seed = random_seed;
 
         /* Create and initalize the stations. */
@@ -130,32 +136,37 @@ int main(void)
         {
           simulation_run_execute_event(simulation_run);
         }
-
+        data.tpt = (double)data.number_of_packets_processed / (data.end_time - data.init_time);
+        data.g = (double)(data.arrival_count + data.number_of_collisions) / (data.end_time - data.init_time);
+        
         for_avg_acc.arrival_count += data.arrival_count;
-        for_avg_acc.blip_counter += data.blip_counter;
-        for_avg_acc.packets_processed += data.packets_processed;
         for_avg_acc.number_of_packets_processed += data.number_of_packets_processed;
         for_avg_acc.number_of_collisions += data.number_of_collisions;
         for_avg_acc.accumulated_delay += data.accumulated_delay;
-        for_avg_acc.init_time += data.init_time;
-        for_avg_acc.end_time += data.end_time;
+        for_avg_acc.tpt += data.tpt;
+        for_avg_acc.g += data.g;
 
+        printf("seed = %d \n", data.random_seed);
+        printf("start time = %f\n", data.init_time);
+        printf("end time = %f\n", data.end_time);
+        printf("collisions = %d \n", data.number_of_collisions);
+        printf("Throughput = %f \n", data.tpt);
+        printf("G = %f \n\n", data.g);
         /* Print out some results. */
         //output_results(simulation_run);
 
         /* Clean up memory. */
         cleanup(simulation_run);
-      } // end while
+      }
 
       for_avg_acc.arrival_count /= size_rand_seed;
-      for_avg_acc.blip_counter /= size_rand_seed;
-      for_avg_acc.packets_processed /= size_rand_seed;
       for_avg_acc.number_of_packets_processed /= size_rand_seed;
       for_avg_acc.number_of_collisions /= size_rand_seed;
       for_avg_acc.accumulated_delay /= size_rand_seed;
       for_avg_acc.init_time /= size_rand_seed;
       for_avg_acc.end_time /= size_rand_seed;
-
+      for_avg_acc.tpt /= size_rand_seed;
+      for_avg_acc.g /= size_rand_seed;
       fp = fopen(data_set_name, "a");
       //cell/element name/type
 
@@ -168,8 +179,14 @@ int main(void)
       //fprintf(fp, ("Packet Arrival Rate"));
       fprintf(fp, "%f, ", PACKET_ARRIVAL_RATE_LIST[k]);
 
+      //fprintf(fp, ("G"));
+      fprintf(fp, "%f, ", for_avg_acc.g);
+
+      //fprintf(fp, ("Number of collision"));
+      fprintf(fp, "%d, ", for_avg_acc.number_of_collisions);
+
       //fprintf(fp, ("Throughput, "));
-      fprintf(fp, "%f, ", (double)for_avg_acc.number_of_packets_processed / (for_avg_acc.end_time - for_avg_acc.init_time));
+      fprintf(fp, "%f, ", for_avg_acc.tpt);
 
       //fprintf(fp, ("Mean Delay, "));
       fprintf(fp, "%f, ", (double)for_avg_acc.accumulated_delay / for_avg_acc.number_of_packets_processed);
@@ -181,9 +198,12 @@ int main(void)
       printf("Random Seed = %d \n", random_seed);
       printf("Number of Stations = %d \n", NUMBER_OF_STATIONS_LIST[l]);
       printf("Packet Arrival Rate = %f \n", PACKET_ARRIVAL_RATE_LIST[k]);
-      printf("Throughput = %f \n", for_avg_acc.number_of_packets_processed / (for_avg_acc.end_time - for_avg_acc.init_time));
+      printf("G = %f \n", for_avg_acc.g);
+      printf("Packet duration = %d \n", MEAN_PACKET_DURATION);
+      printf("Throughput = %f \n", for_avg_acc.tpt);
+      printf("theo_throughput= %f \n", for_avg_acc.g * exp(-2 * for_avg_acc.g));
+      printf("number of arrivals = %ld \n", for_avg_acc.arrival_count);
       printf("number of collision = %d \n", for_avg_acc.number_of_collisions);
-      printf("total time = %f \n", (for_avg_acc.end_time - for_avg_acc.init_time));
       printf("Mean Delay = %f \n", (double)for_avg_acc.accumulated_delay / for_avg_acc.number_of_packets_processed);
       printf("\n");
     }

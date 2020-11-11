@@ -80,9 +80,12 @@ typedef struct _simulation_run_data_
   unsigned random_seed;
 
   double arrival_rate;
+  double packet_backoff_duration;
   int number_of_stations;
   double init_time;
   double end_time;
+  double tpt;
+  double g;
 } Simulation_Run_Data, *Simulation_Run_Data_Ptr;
 
 /**********************************************************************/

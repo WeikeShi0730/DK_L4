@@ -141,15 +141,20 @@ int main(void)
         }
         data.tpt = (double)data.number_of_packets_processed / (data.end_time - data.init_time);
         data.g = (double)(data.arrival_count + data.number_of_collisions) / (data.end_time - data.init_time);
-        printf("start time = %f\n", data.init_time);
-        printf("end time = %f\n", data.end_time);
-        printf("collisions = %d \n\n", data.number_of_collisions);
+        
         for_avg_acc.arrival_count += data.arrival_count;
         for_avg_acc.number_of_packets_processed += data.number_of_packets_processed;
         for_avg_acc.number_of_collisions += data.number_of_collisions;
         for_avg_acc.accumulated_delay += data.accumulated_delay;
         for_avg_acc.tpt += data.tpt;
         for_avg_acc.g += data.g;
+
+        printf("seed = %d \n", data.random_seed);
+        printf("start time = %f\n", data.init_time);
+        printf("end time = %f\n", data.end_time);
+        printf("collisions = %d \n", data.number_of_collisions);
+        printf("Throughput = %f \n", data.tpt);
+        printf("G = %f \n\n", data.g);
         /* Print out some results. */
         //output_results(simulation_run);
 

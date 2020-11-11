@@ -1,16 +1,16 @@
 clear all;
-Table = csvread('Q2.csv',1);  % skips the first three rows of data
+Table = csvread('Q3.csv',1);  % skips the first three rows of data
 
 chan_size = 10;
-loop_size = 3;
+loop_size = 1;
 
 %experiment
-arrival_rate = Table(1:chan_size, 3);
+mean_delay = Table(1:chan_size, 7);
 
 hold on
 for i = 1 : loop_size
-    delay = Table(chan_size*(i-1)+1:chan_size*i, 8);
-    plot(arrival_rate, delay, 'LineWidth',5);
+    delay = Table(chan_size*(i-1)+1:chan_size*i, 6);
+    plot(mean_delay, delay, 'LineWidth',5);
 end
 legend('Backduration = 5', 'Backduration = 10', 'Backduration = 20');
 hold off
