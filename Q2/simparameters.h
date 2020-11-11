@@ -27,14 +27,18 @@
 
 /*******************************************************************************/
 
-#define NUMBER_OF_STATIONS 5,5,5
+#define SIM_TIME_END 1E6
+
+#define NUMBER_OF_STATIONS 10
 #define MEAN_PACKET_DURATION 1      /* normalized packet Tx time */
 #define PACKET_ARRIVAL_RATE  0.01, 0.03, 0.05, 0.08, 0.1, 0.13, 0.18, 0.22, 0.24, 0.28 /* packets per Tx time 10: 0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.19, 0.2, 0.3, 0.35*/
-#define MEAN_BACKOFF_DURATION 3, 5, 7 /* in units of packet transmit time, Tx */
-#define RUNLENGTH 1000000
+//#define PACKET_ARRIVAL_RATE 0.08 
+#define MEAN_BACKOFF_DURATION 5 /* in units of packet transmit time, Tx */
+#define RUNLENGTH 1E6
 #define BLIPRATE 100000
 
 /* Comma separated list of random seeds to run. */
+//#define RANDOM_SEED_LIST 300, 678 
 #define RANDOM_SEED_LIST 300, 678, 8874, 9876, 6909, 1573, 3450, 400050636, 400099173
 
 /*******************************************************************************/

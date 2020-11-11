@@ -135,7 +135,11 @@ int main(void)
                                           exponential_generator((double)1 / PACKET_ARRIVAL_RATE_LIST[k]));
 
         /* Execute events until we are finished. */
+#ifdef SIM_TIME_END
+        while (simulation_run_get_time(simulation_run) < SIM_TIME_END)
+#else
         while (data.number_of_packets_processed < RUNLENGTH)
+#endif
         {
           simulation_run_execute_event(simulation_run);
         }
@@ -154,7 +158,9 @@ int main(void)
         printf("end time = %f\n", data.end_time);
         printf("collisions = %d \n", data.number_of_collisions);
         printf("Throughput = %f \n", data.tpt);
-        printf("G = %f \n\n", data.g);
+        printf("G = %f \n", data.g);
+        printf("number_of_packets_processed = %d \n", data.number_of_packets_processed);
+        printf("\n");
         /* Print out some results. */
         //output_results(simulation_run);
 
