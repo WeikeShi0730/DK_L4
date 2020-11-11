@@ -103,6 +103,8 @@ transmission_end_event(Simulation_Run_Ptr simulation_run, void * packet)
   Time backoff_duration, now;
   Simulation_Run_Data_Ptr data;
   Channel_Ptr channel;
+  int min_c;
+  double binary_exponential_backoff;
 
   data = (Simulation_Run_Data_Ptr) simulation_run_data(simulation_run);
   channel = data->channel;
@@ -165,8 +167,23 @@ transmission_end_event(Simulation_Run_Ptr simulation_run, void * packet)
       set_channel_state(channel, IDLE);
     }
 
-    double binary_exponential_backoff = pow(2, this_packet->collision_count);
-    backoff_duration = uniform_generator() * binary_exponential_backoff;
+    if (this_packet->collision_count > MIN_C)
+    {
+        min_c = MIN_C;
+    }
+    else
+    {
+        min_c = this_packet->collision_count;
+    }
+    //printf("min_c = %d \n", min_c);
+    //printf("shift min_c = %d \n", (2<<(min_c-1)));
+#ifdef USE_MIN_C
+    backoff_duration = uniform_generator() * (2<<(min_c-1));
+#else
+    backoff_duration = uniform_generator() * (2<<(this_packet->collision_count-1));
+#endif
+    //printf("backoff_duration = %f \n", backoff_duration);
+    printf("\n");
 
     schedule_transmission_start_event(simulation_run,
 				      now + backoff_duration,

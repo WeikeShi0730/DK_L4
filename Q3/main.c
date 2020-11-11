@@ -21,7 +21,7 @@
  */
 
 /*******************************************************************************/
-
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -113,6 +113,7 @@ int main(void)
         data.stations = (Station_Ptr)xcalloc((unsigned int)NUMBER_OF_STATIONS_LIST[l],
                                              sizeof(Station));
 
+        assert(NUMBER_OF_STATIONS_LIST[l] != 1);
         /* Initialize the stations. */
         for (int i = 0; i < NUMBER_OF_STATIONS_LIST[l]; i++)
         {
@@ -152,8 +153,9 @@ int main(void)
         printf("collisions = %d \n", data.number_of_collisions);
         printf("Throughput = %f \n", data.tpt);
         printf("G = %f \n\n", data.g);
+        printf("sim_time = %f \n\n", data.end_time);
         /* Print out some results. */
-        //output_results(simulation_run);
+        output_results(simulation_run);
 
         /* Clean up memory. */
         cleanup(simulation_run);

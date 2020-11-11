@@ -81,12 +81,14 @@ void output_results(Simulation_Run_Ptr this_simulation_run)
   printf("Mean Delay   = %.1f \n",
 	 sim_data->accumulated_delay/sim_data->number_of_packets_processed);
 
-  printf("Mean collisions per packet = %.3f\n",
+  printf("Mean collisions per packet = %f\n",
 	 (double) sim_data->number_of_collisions / 
 	 sim_data->number_of_packets_processed);
 
   for(i=0; i<sim_data->number_of_stations; i++) {
 
+    //printf("accumulated_delay = %f \n", (sim_data->stations+i)->accumulated_delay);
+    //printf("packet_count = %d \n", (sim_data->stations+i)->packet_count);
     printf("Station %2i Mean Delay = %8.1f \n", i,
 	   (sim_data->stations+i)->accumulated_delay / 
 	   (sim_data->stations+i)->packet_count);
