@@ -153,9 +153,9 @@ int main(void)
         printf("collisions = %d \n", data.number_of_collisions);
         printf("Throughput = %f \n", data.tpt);
         printf("G = %f \n\n", data.g);
-        printf("sim_time = %f \n\n", data.end_time);
+        //printf("sim_time = %f \n\n", data.end_time);
         /* Print out some results. */
-        output_results(simulation_run);
+        //output_results(simulation_run);
 
         /* Clean up memory. */
         cleanup(simulation_run);
