@@ -22,6 +22,7 @@
 
 /*******************************************************************************/
 
+#include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include "packet_duration.h"
@@ -85,7 +86,12 @@ packet_arrival_event(Simulation_Run_Ptr simulation_run, void* dummy_ptr)
 
   new_packet = (Packet_Ptr) xmalloc(sizeof(Packet));
   new_packet->arrive_time = now;
-  new_packet->service_time = get_packet_duration();
+  new_packet->service_time = data->mini_slot_duration;
+#ifdef D_duration
+  new_packet->X = (data->mean_data_packet_duration);
+#else
+  new_packet->X = exponential_generator(data->mean_data_packet_duration);
+#endif
   new_packet->status = WAITING;
   new_packet->collision_count = 0;
   new_packet->station_id = random_station_id;
@@ -97,26 +103,34 @@ packet_arrival_event(Simulation_Run_Ptr simulation_run, void* dummy_ptr)
   /* If this is the only packet at the station, transmit it (i.e., the
      ALOHA protocol). It stays in the queue either way. */
   current_slot_end_time = data->current_slot_end_time; 
-  packet_duration = get_packet_duration();
-  current_slot_start_time = current_slot_end_time - get_packet_duration() - SMALL_TIME * 2; 
+  packet_duration = data->mini_slot_duration;
+  current_slot_start_time = current_slot_end_time - packet_duration - SMALL_TIME * 2; 
 
   if(fifoqueue_size(stn_buffer) == 1) {
-      if (now <= current_slot_end_time && now > current_slot_start_time + SMALL_TIME)
+      if (data->reserve_mode == 1)
       {
-        TRACE(printf("outside slot current_slot_end_time = %f\n", current_slot_end_time););
-        /* Transmit the packet. */
-        schedule_transmission_start_event(simulation_run, current_slot_end_time + SMALL_TIME, (void *) new_packet);
-      }
-      else if (now <= current_slot_start_time + SMALL_TIME && now >= current_slot_start_time)
-      {
-        TRACE(printf("within slot current_slot_end_time = %f\n", current_slot_end_time););
-        schedule_transmission_start_event(simulation_run, current_slot_start_time + SMALL_TIME, (void *) new_packet);
+          if (now <= current_slot_end_time && now > current_slot_start_time + SMALL_TIME)
+          {
+            TRACE(printf("outside slot current_slot_end_time = %f\n", current_slot_end_time););
+            /* Transmit the packet. */
+            schedule_transmission_start_event(simulation_run, current_slot_end_time + SMALL_TIME, (void *) new_packet);
+          }
+          else if (now <= current_slot_start_time + SMALL_TIME && now >= current_slot_start_time)
+          {
+            TRACE(printf("within slot current_slot_end_time = %f\n", current_slot_end_time););
+            schedule_transmission_start_event(simulation_run, current_slot_start_time + SMALL_TIME, (void *) new_packet);
 
+          }
+          else
+          {
+            TRACE(printf("Unknown case \n"););
+          }
       }
-      else
-      {
-        TRACE(printf("Unknown case \n"););
-      }
+    else
+    {
+        schedule_transmission_start_event(simulation_run, data->expect_end_data_packet_duration + SMALL_TIME, (void *) new_packet);
+        
+    }
   }
 
 #ifdef D_Arrival
@@ -133,13 +147,49 @@ slot_event(Simulation_Run_Ptr simulation_run, void* dummy_ptr)
 {
   Time now;
   Simulation_Run_Data_Ptr data;
+  Packet_Ptr this_packet;
 
   now = simulation_run_get_time(simulation_run);
 
   data = (Simulation_Run_Data_Ptr) simulation_run_data(simulation_run);
-  data->current_slot_end_time = now + get_packet_duration() + 2 * SMALL_TIME;
+  data->current_slot_end_time = now + data->mini_slot_duration + 2 * SMALL_TIME;
 
-  schedule_slot_event(simulation_run, data->current_slot_end_time);
+#ifndef ASSERT_OFF
+  assert(data->reserve_mode == 1);
+  assert(data->cnt_slot <= data->num_mini_slot);
+#endif
+  //printf("at : %f, cnt_slot: %d fifoqueue_size: %d \n",now , data->cnt_slot, fifoqueue_size(data->data_fifo));
+  if (data->cnt_slot == data->num_mini_slot)
+  {
+    data->cnt_slot = 0;
+
+    if (fifoqueue_size(data->data_fifo) == 0)
+    {
+        TRACE(printf("No station compete successful\n"););
+        data->reserve_mode = 1;
+        data->expect_end_data_packet_duration = 0;
+        schedule_slot_event(simulation_run, data->current_slot_end_time);
+    }
+    else
+    {
+    //TODO schedule data event 
+        data->reserve_mode = 0;
+        this_packet = fifoqueue_see_front(data->data_fifo);
+        printf("fifoqueue_size : %d \n",fifoqueue_size(data->data_fifo));
+        //printf("this_packet->X : %f \n",this_packet->X);
+        //final step make expect_end_data_packet_duration relative time to become abs time
+        data->expect_end_data_packet_duration += now;
+        schedule_end_data_packet_event(simulation_run, now + this_packet->X, this_packet);
+
+    }
+
+  }
+  else
+  {
+    data->cnt_slot++;
+    schedule_slot_event(simulation_run, data->current_slot_end_time);
+    
+  }
 }
 
 

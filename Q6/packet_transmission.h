@@ -35,6 +35,9 @@
  * Function prototypes
  */
 
+//Packet_Ptr
+//deep_copy_packet(Packet_Ptr, void *);
+
 void
 transmission_start_event(Simulation_Run_Ptr, void *);
 
@@ -47,6 +50,10 @@ transmission_end_event(Simulation_Run_Ptr, void *);
 long int
 schedule_transmission_end_event(Simulation_Run_Ptr, Time, void *);
 
+void end_data_packet_event(Simulation_Run_Ptr, void *);
+
+long int
+schedule_end_data_packet_event(Simulation_Run_Ptr, Time, void *);
 /*******************************************************************************/
 
 #endif /* packet_transmission.h */

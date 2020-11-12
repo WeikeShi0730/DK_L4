@@ -33,7 +33,7 @@
 #include "packet_transmission.h"
 #include "main.h"
 
-#include "packet_duration.h"
+//#include "packet_duration.h"
 /*******************************************************************************/
 
 int main(void)
@@ -41,6 +41,9 @@ int main(void)
   /* Get the list of random number generator seeds defined in simparameters.h */
   unsigned random_seed;
   unsigned RANDOM_SEEDS[] = {RANDOM_SEED_LIST, 0};
+  double MINI_SLOT_M_LIST[] = {MINI_SLOT_M};
+  double MINI_SLOT_DURATION_LIST[] = {MINI_SLOT_DURATION};
+  double MEAN_DATA_PACKET_DURATION_LIST[] = {MEAN_DATA_PACKET_DURATION};
   double MEAN_BACKOFF_DURATION_LIST[] = {MEAN_BACKOFF_DURATION};
   unsigned int NUMBER_OF_STATIONS_LIST[] = {NUMBER_OF_STATIONS};
   double PACKET_ARRIVAL_RATE_LIST[] = {PACKET_ARRIVAL_RATE};
@@ -83,6 +86,7 @@ int main(void)
       for_avg_acc.accumulated_delay = 0;
 
       int j = 0;
+
       /* Do a new simulation_run for each random number generator seed. */
       while ((random_seed = RANDOM_SEEDS[j++]) != 0)
       {
@@ -97,10 +101,16 @@ int main(void)
         simulation_run_set_data(simulation_run, (void *)&data);
 
         data.current_slot_end_time = 0;
-        TRACE(printf("main get_packet_duration = %f\n", get_packet_duration()););
         TRACE(printf("main SMALL_TIME = %f\n", SMALL_TIME););
         TRACE(printf("main current_slot_end_time = %f\n", data.current_slot_end_time););
-        data.sim_time = 0;
+
+        data.data_fifo = fifoqueue_new();
+        data.expect_end_data_packet_duration = 0;
+        data.cnt_slot = 0;
+        data.reserve_mode = 1;
+        data.num_mini_slot = MINI_SLOT_M_LIST[l];
+        data.mini_slot_duration = MINI_SLOT_DURATION_LIST[l];
+        data.mean_data_packet_duration = MEAN_DATA_PACKET_DURATION_LIST[l];
         data.throughput = 0;
         data.mean_delay = 0;
         data.G_per_X = 0;
@@ -132,20 +142,24 @@ int main(void)
         /* Create and initialize the channel. */
         data.channel = channel_new();
 
+        printf(" main data->reserve_mode : %d \n",data.reserve_mode);
         /* Schedule initial packet arrival. */
         schedule_packet_arrival_event(simulation_run, simulation_run_get_time(simulation_run) + exponential_generator((double)1 / PACKET_ARRIVAL_RATE_LIST[k]));
         schedule_slot_event(simulation_run, simulation_run_get_time(simulation_run));
-
-        /* Execute events until we are finished. */
+#ifdef SIM_TIME_END
+        while (simulation_run_get_time(simulation_run) < SIM_TIME_END)
+#else
         while (data.number_of_packets_processed < RUNLENGTH)
+#endif
         {
           simulation_run_execute_event(simulation_run);
         }
 
         for_avg_acc.sim_time += data.sim_time;
-        for_avg_acc.throughput += (data.number_of_packets_processed/data.sim_time * get_packet_duration());
-        for_avg_acc.mean_delay += (data.accumulated_delay/data.sim_time * get_packet_duration());
-        for_avg_acc.G_per_X += ((data.number_of_collisions + data.arrival_count)/data.sim_time * get_packet_duration());
+        //TODO 
+        //for_avg_acc.throughput += (data.number_of_packets_processed/data.sim_time * get_packet_duration());
+        //for_avg_acc.mean_delay += (data.accumulated_delay/data.sim_time * get_packet_duration());
+        //for_avg_acc.G_per_X += ((data.number_of_collisions + data.arrival_count)/data.sim_time * get_packet_duration());
         for_avg_acc.arrival_count += data.arrival_count;
         for_avg_acc.blip_counter += data.blip_counter;
         for_avg_acc.packets_processed += data.packets_processed;
@@ -178,7 +192,7 @@ int main(void)
       fprintf(fp, "%d, ", NUMBER_OF_STATIONS_LIST[l]);
 
       //fprintf(fp, ("Mean Packet Duration"));
-      fprintf(fp, "%f, ", MEAN_PACKET_DURATION);
+      fprintf(fp, "%f, ", MEAN_DATA_PACKET_DURATION_LIST[l]);
 
       //fprintf(fp, ("Packet Arrival Rate"));
       fprintf(fp, "%f, ", PACKET_ARRIVAL_RATE_LIST[k]);

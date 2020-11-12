@@ -25,19 +25,25 @@
 #ifndef _SIMPARAMETERS_H_
 #define _SIMPARAMETERS_H_
 
+#define ASSERT_OFF
 #define SMALL_TIME 0.001
-//#define FAST_RUN
+#define FAST_RUN
 //#define D_Arrival
+#define D_duration
+//#define SIM_TIME_END 1E5
+#define MEAN_PACKET_DURATION 1
 
 /*******************************************************************************/
 
 #ifdef FAST_RUN
 
 #define NUMBER_OF_STATIONS 10
-#define MEAN_PACKET_DURATION 1      /* normalized packet Tx time */
-#define PACKET_ARRIVAL_RATE 0.1, 0.3    /* packets per Tx time */
+#define PACKET_ARRIVAL_RATE 0.01    /* packets per Tx time */
 #define MEAN_BACKOFF_DURATION 5   /* in units of packet transmit time, Tx */
-#define RUNLENGTH 700
+#define MINI_SLOT_M 100  
+#define MINI_SLOT_DURATION 1 //same as MEAN_PACKET_DURATION   
+#define MEAN_DATA_PACKET_DURATION 1   
+#define RUNLENGTH 1E3
 #define BLIPRATE 100000
 
 /* Comma separated list of random seeds to run. */
@@ -45,9 +51,12 @@
 
 #else
 #define NUMBER_OF_STATIONS 10, 10, 10, 5, 5, 5
-#define MEAN_PACKET_DURATION 1      /* normalized packet Tx time */
 #define PACKET_ARRIVAL_RATE 0.1, 0.2, 0.3    /* packets per Tx time */
 #define MEAN_BACKOFF_DURATION 5, 10, 20, 3, 5, 7   /* in units of packet transmit time, Tx */
+#define MINI_SLOT_M 10   
+#define MINI_SLOT_DURATION 1 //same as MEAN_PACKET_DURATION   
+#define MEAN_PACKET_DURATION 1      /* normalized packet Tx time */
+#define MEAN_DATA_PACKET_DURATION 5   
 #define RUNLENGTH 700
 #define BLIPRATE 100000
 
