@@ -195,7 +195,7 @@ transmission_end_event(Simulation_Run_Ptr simulation_run, void * packet)
     set_channel_state(channel, IDLE);
     
     TRACE(printf("Success in mini slot.\n"););
-    printf("Success in mini slot.\n");
+    //printf("Success in mini slot.\n");
 
     /* Collect statistics. */
     //TODO data->number_of_packets_processed++;
@@ -225,11 +225,11 @@ transmission_end_event(Simulation_Run_Ptr simulation_run, void * packet)
     //printf("buffer fifoqueue_size %d\n",fifoqueue_size(buffer));
     //printf("buffer tmp->arrive_time: %f \n",tmp->arrive_time);
 
-    printf(" \n");
+    //printf(" \n");
     free((void*) fifoqueue_get(buffer));
 
     data->expect_end_data_packet_duration += deep_copy_put_into_data_fifo->X;
-    printf("end data->expect_end_data_packet_duration : %f \n",data->expect_end_data_packet_duration);
+    //printf("end data->expect_end_data_packet_duration : %f \n",data->expect_end_data_packet_duration);
 
     /* See if there is another packet at this station. If so, enable
        it for transmission. We will transmit immediately. */
@@ -255,6 +255,7 @@ transmission_end_event(Simulation_Run_Ptr simulation_run, void * packet)
     }
 
     backoff_duration = 2.0*uniform_generator() * data->packet_backoff_duration;
+    num_of_slots = round(backoff_duration / data->mini_slot_duration); 
 
     TRACE(printf("num_of_slots = %d\n", num_of_slots););
     //printf("now = %f\n", now);
@@ -300,8 +301,6 @@ end_data_packet_event(Simulation_Run_Ptr simulation_run, void * packet)
   this_packet = (Packet_Ptr) packet;
   //buffer = (data->stations+this_packet->station_id)->buffer;
 
-  /* This station has stopped transmitting. */
-  decrement_transmitting_stn_count(channel);
 
 #ifndef ASSERT_OFF
     assert(data->reserve_mode == 0);
@@ -319,7 +318,7 @@ end_data_packet_event(Simulation_Run_Ptr simulation_run, void * packet)
 
     output_blip_to_screen(simulation_run);
 
-    printf("number_of_packets_processed : %d \n",data->number_of_packets_processed);
+    //printf("number_of_packets_processed : %d \n",data->number_of_packets_processed);
 
     /* This packet is done. */
     free((void*) fifoqueue_get(data->data_fifo));
@@ -331,7 +330,7 @@ end_data_packet_event(Simulation_Run_Ptr simulation_run, void * packet)
     }
     else
     {
-      printf("switch back to reserve mode\n");
+      //printf("at %f switch back to reserve mode\n", now);
       data->reserve_mode = 1;
 #ifndef ASSERT_OFF
       assert(now == data->expect_end_data_packet_duration);

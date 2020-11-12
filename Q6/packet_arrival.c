@@ -166,6 +166,7 @@ slot_event(Simulation_Run_Ptr simulation_run, void* dummy_ptr)
     if (fifoqueue_size(data->data_fifo) == 0)
     {
         TRACE(printf("No station compete successful\n"););
+        //printf("No station compete successful\n");
         data->reserve_mode = 1;
         data->expect_end_data_packet_duration = 0;
         schedule_slot_event(simulation_run, data->current_slot_end_time);
@@ -175,7 +176,7 @@ slot_event(Simulation_Run_Ptr simulation_run, void* dummy_ptr)
     //TODO schedule data event 
         data->reserve_mode = 0;
         this_packet = fifoqueue_see_front(data->data_fifo);
-        printf("fifoqueue_size : %d \n",fifoqueue_size(data->data_fifo));
+        //printf("fifoqueue_size : %d \n",fifoqueue_size(data->data_fifo));
         //printf("this_packet->X : %f \n",this_packet->X);
         //final step make expect_end_data_packet_duration relative time to become abs time
         data->expect_end_data_packet_duration += now;
