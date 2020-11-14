@@ -62,6 +62,7 @@ typedef struct _packet_
 {
   double arrive_time;
   double service_time;
+  double X;
   int station_id;
   Packet_Status status;
   int collision_count;
@@ -83,6 +84,15 @@ typedef struct _simulation_run_data_
   double throughput;
   double mean_delay;
   double G_per_X;
+
+  int cnt_slot;
+  int reserve_mode;
+  int num_mini_slot;
+  double mini_slot_duration;
+  double mean_data_packet_duration;
+
+  Fifoqueue_Ptr data_fifo;
+  double expect_end_data_packet_duration;
 
   double arrival_rate;
   double packet_backoff_duration;

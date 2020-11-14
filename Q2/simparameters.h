@@ -35,11 +35,12 @@
 #define PACKET_ARRIVAL_RATE 0.1882
 #define MEAN_BACKOFF_DURATION 10 /* in units of packet transmit time, Tx */
 #define RUNLENGTH 1000000
+
 #define BLIPRATE 100000
 
 /* Comma separated list of random seeds to run. */
-//#define RANDOM_SEED_LIST 300, 678 
-#define RANDOM_SEED_LIST 300, 678, 8874, 9876, 6909, 1573, 3450, 400050636, 400099173
+#define RANDOM_SEED_LIST 300, 678 
+//#define RANDOM_SEED_LIST 6909, 1573, 3450, 400050636, 400099173
 
 /*******************************************************************************/
 

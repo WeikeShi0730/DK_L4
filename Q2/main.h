@@ -69,6 +69,7 @@ typedef struct _simulation_run_data_
   Channel_Ptr channel;
   long int blip_counter;
   long int arrival_count;
+  long int attempt_count;
   long int number_of_packets_processed;
   long int number_of_collisions;
   double accumulated_delay;

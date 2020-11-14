@@ -63,6 +63,11 @@ int main(void)
   fprintf(fp, ("Packet Arrival Rate, "));
   fprintf(fp, ("Mean Backoff duration, "));
   fprintf(fp, ("Mean Delay, "));
+  fprintf(fp, ("throughput, "));
+  fprintf(fp, ("theo_throughput, "));
+  fprintf(fp, ("G_per_X, "));
+  fprintf(fp, ("servie_fraction, "));
+  fprintf(fp, ("sim_time, "));
 
   fprintf(fp, "\n");
   fclose(fp);
@@ -188,6 +193,21 @@ int main(void)
 
       //fprintf(fp, ("Mean Delay, "));
       fprintf(fp, "%f, ", (double)for_avg_acc.accumulated_delay / for_avg_acc.number_of_packets_processed);
+
+      //fprintf(fp, ("throughput, "));
+      fprintf(fp, "%f, ", for_avg_acc.throughput);
+
+      //fprintf(fp, ("theo_throughput, "));
+      fprintf(fp, "%f, ", for_avg_acc.G_per_X * exp(-1*for_avg_acc.G_per_X));
+
+      //fprintf(fp, ("G_per_X, "));
+      fprintf(fp, "%f, ", for_avg_acc.G_per_X);
+
+      //fprintf(fp, ("servie_fraction, "));
+      fprintf(fp, "%f, ", (double)for_avg_acc.number_of_packets_processed/for_avg_acc.arrival_count);
+
+      //fprintf(fp, ("sim_time, "));
+      fprintf(fp, "%f, ", for_avg_acc.sim_time);
 
       fprintf(fp, "\n");
       fclose(fp);

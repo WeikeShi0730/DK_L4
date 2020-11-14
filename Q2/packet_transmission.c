@@ -57,6 +57,7 @@ transmission_start_event(Simulation_Run_Ptr simulation_run, void * ptr)
   this_packet = (Packet_Ptr) ptr;
   data = (Simulation_Run_Data_Ptr) simulation_run_data(simulation_run);
   channel = data->channel;
+  data->attempt_count++;
 
   /* This packet is starting to transmit. */
   increment_transmitting_stn_count(channel);
