@@ -87,9 +87,11 @@ void output_results(Simulation_Run_Ptr this_simulation_run)
 
   for(i=0; i<sim_data->number_of_stations; i++) {
 
+    printf("Station %2i packet_count = %d \n",i ,(sim_data->stations+i)->packet_count);
     printf("Station %2i Mean Delay = %8.1f \n", i,
 	   (sim_data->stations+i)->accumulated_delay / 
 	   (sim_data->stations+i)->packet_count);
+    printf("\n");
   }
   printf("\n\n");
 }
