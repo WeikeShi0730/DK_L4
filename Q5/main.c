@@ -68,6 +68,7 @@ int main(void)
   fprintf(fp, ("G_per_X, "));
   fprintf(fp, ("servie_fraction, "));
   fprintf(fp, ("sim_time, "));
+  fprintf(fp, ("number_of_collisions, "));
 
   fprintf(fp, "\n");
   fclose(fp);
@@ -208,6 +209,9 @@ int main(void)
 
       //fprintf(fp, ("sim_time, "));
       fprintf(fp, "%f, ", for_avg_acc.sim_time);
+
+      //fprintf(fp, ("number_of_collisions, "));
+      fprintf(fp, "%d, ", for_avg_acc.number_of_collisions);
 
       fprintf(fp, "\n");
       fclose(fp);
