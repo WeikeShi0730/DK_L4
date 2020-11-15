@@ -8,9 +8,34 @@ Table = csvread('slot_duration.csv',1);  % it affects
 chan_size = 10;
 loop_size = 5;
 
+for i = 1 : loop_size
+    arrival_rate(:,i) = Table(chan_size*(i-1)+1:chan_size*i, 3);
+    D(:,i) = Table(chan_size*(i-1)+1:chan_size*i, 5);
+    tpt(:,i) = Table(chan_size*(i-1)+1:chan_size*i, 7);
+end
 
 figure(1)
-%option to show multi curve diff station
+%option to D vs tpt
+
+%hold on
+%for i = 1 : loop_size
+    %D_vs_tpt_p(i) = plot(tpt(:,i), D(:,i), 'LineWidth',1);
+%end
+%
+%legend('Backduration = 5', 'Backduration = 10');
+%hold off
+%
+%grid on
+%title('Mean Delay vs. Throughput');
+%%set(gca, 'XScale', 'log');
+%%ylim([0 15])
+%
+%xlabel('Throughput');
+%ylabel('Mean delay');
+
+%break
+
+%option to tpt vs lamda
 for i = 1 : loop_size
     arrival_rate(:,i) = Table(chan_size*(i-1)+1:chan_size*i, 3);
     D(:,i) = Table(chan_size*(i-1)+1:chan_size*i, 5);
@@ -19,21 +44,17 @@ end
 
 hold on
 for i = 1 : loop_size
-    D_vs_tpt_p(i) = plot(tpt(:,i), D(:,i), 'LineWidth',1);
+    tpt_vs_lamda_p(i) = plot(arrival_rate(:,i), tpt(:,i), 'LineWidth',1);
 end
 
 legend('Backduration = 5', 'Backduration = 10');
 hold off
 
-figure(2)
-hold on
-for i = 1 : loop_size
-    D_vs_lamda_p(i) = plot(arrival_rate(:,i), D(:,i), 'LineWidth',1);
-end
 grid on
-title('Mean Delay vs. Throughput');
+title('throughput vs. arrival_rate');
 %set(gca, 'XScale', 'log');
 %ylim([0 15])
 
-xlabel('Throughput');
-ylabel('Mean delay');
+xlabel('arrival_rate');
+ylabel('throughput');
+
