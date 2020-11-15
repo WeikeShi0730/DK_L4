@@ -26,15 +26,16 @@
 #define _SIMPARAMETERS_H_
 
 /*******************************************************************************/
-//#define USE_RAND_FOR
-//#define SIM_TIME_END 1E7
+
+#define SIM_TIME_END 1E7
 
 #define NUMBER_OF_STATIONS 10
 #define MEAN_PACKET_DURATION 1      /* normalized packet Tx time */
-#define PACKET_ARRIVAL_RATE   0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.19, 0.2, 0.3, 0.35
-//#define PACKET_ARRIVAL_RATE 0.08
-#define MEAN_BACKOFF_DURATION 5 /* in units of packet transmit time, Tx */
-#define RUNLENGTH 1E6
+//#define PACKET_ARRIVAL_RATE  0.01, 0.03, 0.05, 0.08, 0.1, 0.13, 0.18, 0.22, 0.24, 0.28 /* packets per Tx time 10: 0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.19, 0.2, 0.3, 0.35*/
+#define PACKET_ARRIVAL_RATE 0.1882
+#define MEAN_BACKOFF_DURATION 10 /* in units of packet transmit time, Tx */
+#define RUNLENGTH 1000000
+
 #define BLIPRATE 100000
 
 /* Comma separated list of random seeds to run. */

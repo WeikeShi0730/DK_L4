@@ -32,7 +32,7 @@
 
 long int
 schedule_packet_arrival_event(Simulation_Run_Ptr simulation_run,
-			      Time event_time)
+                              Time event_time)
 {
   Event event;
 
@@ -45,8 +45,7 @@ schedule_packet_arrival_event(Simulation_Run_Ptr simulation_run,
 
 /*******************************************************************************/
 
-void
-packet_arrival_event(Simulation_Run_Ptr simulation_run, void* dummy_ptr) 
+void packet_arrival_event(Simulation_Run_Ptr simulation_run, void *dummy_ptr)
 {
   int random_station_id;
   Station_Ptr station;
@@ -57,20 +56,21 @@ packet_arrival_event(Simulation_Run_Ptr simulation_run, void* dummy_ptr)
 
   now = simulation_run_get_time(simulation_run);
 
-  data = (Simulation_Run_Data_Ptr) simulation_run_data(simulation_run);
+  data = (Simulation_Run_Data_Ptr)simulation_run_data(simulation_run);
   data->arrival_count++;
 
-  if(data->init_time == 0){
+  if (data->init_time == 0)
+  {
     data->init_time = now;
   }
 
   /* Randomly pick the station that this packet is arriving to. Note
      that randomly splitting a Poisson process creates multiple
      independent Poisson processes.*/
-  random_station_id = (int) floor(uniform_generator()*data->number_of_stations);
+  random_station_id = (int)floor(uniform_generator() * data->number_of_stations);
   station = data->stations + random_station_id;
 
-  new_packet = (Packet_Ptr) xmalloc(sizeof(Packet));
+  new_packet = (Packet_Ptr)xmalloc(sizeof(Packet));
   new_packet->arrive_time = now;
   new_packet->service_time = get_packet_duration();
   new_packet->status = WAITING;
@@ -79,16 +79,19 @@ packet_arrival_event(Simulation_Run_Ptr simulation_run, void* dummy_ptr)
 
   /* Put the packet in the buffer at that station. */
   stn_buffer = station->buffer;
-  fifoqueue_put(stn_buffer, (void *) new_packet);
+  fifoqueue_put(stn_buffer, (void *)new_packet);
 
   /* If this is the only packet at the station, transmit it (i.e., the
      ALOHA protocol). It stays in the queue either way. */
-  if(fifoqueue_size(stn_buffer) == 1) {
+  if (fifoqueue_size(stn_buffer) == 1)
+  {
     /* Transmit the packet. */
-    schedule_transmission_start_event(simulation_run, now, (void *) new_packet);
+    schedule_transmission_start_event(simulation_run, now, (void *)new_packet);
   }
-
-  /* Schedule the next packet arrival. */
-  schedule_packet_arrival_event(simulation_run, 
-		now + exponential_generator((double) 1/data->arrival_rate));
+  if (data->arrival_count < RUNLENGTH)
+  {
+    /* Schedule the next packet arrival. */
+    schedule_packet_arrival_event(simulation_run,
+                                  now + exponential_generator((double)1 / data->arrival_rate));
+  }
 }
