@@ -304,7 +304,7 @@ end_data_packet_event(Simulation_Run_Ptr simulation_run, void * packet)
 
 #ifndef ASSERT_OFF
     assert(data->reserve_mode == 0);
-    assert(get_channel_state(channel) == SUCCESS); 
+    assert(get_channel_state(channel) == IDLE); 
 #endif
 
     /* Collect statistics. */
@@ -333,7 +333,8 @@ end_data_packet_event(Simulation_Run_Ptr simulation_run, void * packet)
       //printf("at %f switch back to reserve mode\n", now);
       data->reserve_mode = 1;
 #ifndef ASSERT_OFF
-      assert(now == data->expect_end_data_packet_duration);
+      //printf("at %f expect_end_data_packet_duration: %f \n", now,data->expect_end_data_packet_duration);
+      //assert(now == data->expect_end_data_packet_duration);
 #endif
       data->expect_end_data_packet_duration = 0;
 

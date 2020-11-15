@@ -55,7 +55,7 @@ int main(void)
 
   // create a csv file
   FILE *fp;
-  char data_set_name[] = "./Q5.csv";
+  char data_set_name[] = "./Q6.csv";
   //file IO
 
   fp = fopen(data_set_name, "w");
@@ -66,6 +66,12 @@ int main(void)
   fprintf(fp, ("Packet Arrival Rate, "));
   fprintf(fp, ("Mean Backoff duration, "));
   fprintf(fp, ("Mean Delay, "));
+  fprintf(fp, ("sim_time,"));
+  fprintf(fp, ("throughput,"));
+  fprintf(fp, ("arrival_count,"));
+  fprintf(fp, ("number_of_collisions,"));
+  fprintf(fp, ("G_per_X,"));
+  fprintf(fp, ("theo_throughput,"));
 
   fprintf(fp, "\n");
   fclose(fp);
@@ -142,7 +148,7 @@ int main(void)
         /* Create and initialize the channel. */
         data.channel = channel_new();
 
-        printf(" main data->reserve_mode : %d \n",data.reserve_mode);
+        //printf(" main data->reserve_mode : %d \n",data.reserve_mode);
         /* Schedule initial packet arrival. */
         schedule_packet_arrival_event(simulation_run, simulation_run_get_time(simulation_run) + exponential_generator((double)1 / PACKET_ARRIVAL_RATE_LIST[k]));
         schedule_slot_event(simulation_run, simulation_run_get_time(simulation_run));
@@ -157,9 +163,9 @@ int main(void)
 
         for_avg_acc.sim_time += data.sim_time;
         //TODO 
-        //for_avg_acc.throughput += (data.number_of_packets_processed/data.sim_time * get_packet_duration());
-        //for_avg_acc.mean_delay += (data.accumulated_delay/data.sim_time * get_packet_duration());
-        //for_avg_acc.G_per_X += ((data.number_of_collisions + data.arrival_count)/data.sim_time * get_packet_duration());
+        for_avg_acc.throughput += (data.number_of_packets_processed/data.sim_time * data.mean_data_packet_duration);
+        for_avg_acc.mean_delay += (data.accumulated_delay/data.sim_time * data.mean_data_packet_duration);
+        for_avg_acc.G_per_X += ((data.number_of_collisions + data.arrival_count)/data.sim_time *  data.mean_data_packet_duration);
         for_avg_acc.arrival_count += data.arrival_count;
         for_avg_acc.blip_counter += data.blip_counter;
         for_avg_acc.packets_processed += data.packets_processed;
@@ -203,6 +209,24 @@ int main(void)
       //fprintf(fp, ("Mean Delay, "));
       fprintf(fp, "%f, ", (double)for_avg_acc.accumulated_delay / for_avg_acc.number_of_packets_processed);
 
+      //fprintf(fp, ("sim_time"));
+      fprintf(fp, "%f, ", for_avg_acc.sim_time);
+
+      //fprintf(fp, ("throughput"));
+      fprintf(fp, "%f, ", for_avg_acc.throughput);
+
+      //fprintf(fp, ("arrival_count"));
+      fprintf(fp, "%d, ", for_avg_acc.arrival_count);
+
+      //fprintf(fp, ("number_of_collisions"));
+      fprintf(fp, "%d, ", for_avg_acc.number_of_collisions);
+
+      //fprintf(fp, ("G_per_X"));
+      fprintf(fp, "%f, ", for_avg_acc.G_per_X);
+
+      //fprintf(fp, ("theo_throughput"));
+      fprintf(fp, "%f, ", for_avg_acc.G_per_X * exp(-1*for_avg_acc.G_per_X));
+
       fprintf(fp, "\n");
       fclose(fp);
 
@@ -221,6 +245,7 @@ int main(void)
       printf("mean_delay = %f \n", for_avg_acc.mean_delay);
       printf("G_per_X = %f \n", for_avg_acc.G_per_X);
       printf("theo_throughput= %f \n", for_avg_acc.G_per_X * exp(-1*for_avg_acc.G_per_X));
+      printf("mini_slot_duration= %f \n", MINI_SLOT_DURATION_LIST[l]);
       printf("\n");
     }
   }
