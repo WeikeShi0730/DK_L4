@@ -28,9 +28,9 @@
 
 /*******************************************************************************/
 
-#define NUMBER_OF_STATIONS 5, 10
+#define NUMBER_OF_STATIONS 5
 #define MEAN_PACKET_DURATION 1      /* normalized packet Tx time */
-#define PACKET_ARRIVAL_RATE 0.01, 0.1, 0.15, 0.19, 0.2, 0.25, 0.3, 0.31, 0.35, 0.5, 0.7
+#define PACKET_ARRIVAL_RATE 3, 5, 10, 20, 30//0.01, 0.1, 0.15, 0.19, 0.2, 0.25, 0.3, 0.31, 0.35, 0.5, 0.7, 1, 1.2
 #define RUNLENGTH 1E5
 #define BLIPRATE 100000
 

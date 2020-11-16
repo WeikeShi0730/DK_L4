@@ -1,7 +1,7 @@
 clear all;
 Table = csvread('Q2_5.csv',1);  % skips the first three rows of data
 
-chan_size = 15;
+chan_size = 10;
 loop_size = 3;
 
 %experiment
@@ -9,11 +9,10 @@ arrival_rate = Table(1:chan_size, 3);
 
 hold on
 for i = 1 : loop_size
-    %arrival_rate = Table(chan_size*(i-1)+1:chan_size*i, 13);
-    delay = Table(chan_size*(i-1)+1:chan_size*i, 20);
-    tpt = Table(chan_size*(i-1)+1:chan_size*i, 18);
-    %plot(arrival_rate, delay, 'LineWidth',5);
-    plot(arrival_rate, delay, 'LineWidth',3);
+    arrival_rate = Table(1:chan_size, 3);
+    delay = Table(chan_size*(i-1)+1:chan_size*i, 8);
+    
+    plot(arrival_rate, delay, 'LineWidth',5);
 end
 legend('Backduration = 5', 'Backduration = 10', 'Backduration = 20');
 hold off
@@ -36,9 +35,9 @@ ylabel('Mean delay');
 % plot(arrival_rate_20, delay_20, 'LineWidth',3);
 % legend('Backduration = 3', 'Backduration = 5', 'Backduration = 7');
 % hold off
-% 
-% grid on
-% title('Arrival Rate vs. Mean Delay (Stations 5)');
-% 
-% xlabel('Arrival rate');
-% ylabel('Mean delay');
+
+grid on
+title('Arrival Rate vs. Mean Delay (Stations 5)');
+
+xlabel('Arrival rate');
+ylabel('Mean delay');
