@@ -56,6 +56,7 @@ void transmission_start_event(Simulation_Run_Ptr simulation_run, void *ptr)
   this_packet = (Packet_Ptr)ptr;
   data = (Simulation_Run_Data_Ptr)simulation_run_data(simulation_run);
   channel = data->channel;
+  data->attempt_count++;
 
   /* This packet is starting to transmit. */
   increment_transmitting_stn_count(channel);
@@ -109,6 +110,7 @@ void transmission_end_event(Simulation_Run_Ptr simulation_run, void *packet)
 
   data = (Simulation_Run_Data_Ptr)simulation_run_data(simulation_run);
   channel = data->channel;
+  
 
   now = simulation_run_get_time(simulation_run);
 
@@ -134,6 +136,7 @@ void transmission_end_event(Simulation_Run_Ptr simulation_run, void *packet)
     (data->stations + this_packet->station_id)->packet_count++;
     (data->stations + this_packet->station_id)->accumulated_delay +=
         now - this_packet->arrive_time;
+    (data->stations + this_packet->station_id)->collision += this_packet->collision_count;
 
     data->number_of_collisions += this_packet->collision_count;
     data->accumulated_delay += now - this_packet->arrive_time;
@@ -172,23 +175,7 @@ void transmission_end_event(Simulation_Run_Ptr simulation_run, void *packet)
       set_channel_state(channel, IDLE);
     }
 
-    if (this_packet->collision_count > MIN_C)
-    {
-      min_c = MIN_C;
-    }
-    else
-    {
-      min_c = this_packet->collision_count;
-    }
-    //printf("min_c = %d \n", min_c);
-    //printf("shift min_c = %d \n", (2<<(min_c-1)));
-#ifdef USE_MIN_C
-    backoff_duration = uniform_generator() * (2 << (min_c - 1));
-#else
     backoff_duration = uniform_generator() * (2 << (this_packet->collision_count - 1));
-#endif
-    //printf("backoff_duration = %f \n", backoff_duration);
-    //printf("\n");
 
     schedule_transmission_start_event(simulation_run,
                                       now + backoff_duration,

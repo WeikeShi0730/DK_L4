@@ -1,2 +1,2 @@
-Number of Stations, Mean Packet Duration, Packet Arrival Rate, G, Mean Backoff duration, Number of collision, Throughput, Mean Delay, 
-10, 1, 0.188200, 0.821923, 10.000000, 3540442, 0.181712, 75986.673136, 
+Number of Stations, Mean Packet Duration, Packet Arrival Rate, Attempts, G, Mean Backoff duration, Number of collision, Throughput, Theo Throughput, Mean Delay, 
+1, 1, 1.000000, 1000000, 0.999171, 10.000000, 0, 0.999171, 0.135447, 534.167717, 

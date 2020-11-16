@@ -165,7 +165,7 @@ int main(void)
       fprintf(fp, "%d, ", NUMBER_OF_STATIONS_LIST[l]);
 
       //fprintf(fp, ("Mean Packet Duration"));
-      fprintf(fp, "%f, ", MEAN_PACKET_DURATION);
+      fprintf(fp, "%d, ", MEAN_PACKET_DURATION);
 
       //fprintf(fp, ("Packet Arrival Rate"));
       fprintf(fp, "%f, ", PACKET_ARRIVAL_RATE_LIST[k]);

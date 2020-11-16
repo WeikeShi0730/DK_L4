@@ -48,6 +48,7 @@ typedef struct _station_
   long int packet_count;
   double accumulated_delay;
   double mean_delay;
+  int collision;
 } Station, *Station_Ptr;
 
 /**********************************************************************/
@@ -86,6 +87,8 @@ typedef struct _simulation_run_data_
   double end_time;
   double tpt;
   double g;
+  double sim_time;
+  int attempt_count;
 } Simulation_Run_Data, *Simulation_Run_Data_Ptr;
 
 /**********************************************************************/

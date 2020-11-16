@@ -61,16 +61,13 @@ int main(void)
   fprintf(fp, ("Number of Stations, "));
   fprintf(fp, ("Mean Packet Duration, "));
   fprintf(fp, ("Packet Arrival Rate, "));
+  fprintf(fp, ("Attempts, "));
   fprintf(fp, ("G, "));
   fprintf(fp, ("Mean Backoff duration, "));
   fprintf(fp, ("Number of collision, "));
   fprintf(fp, ("Throughput, "));
-  fprintf(fp, ("Mean Delay, "));
   fprintf(fp, ("Theo Throughput, "));
-  fprintf(fp, ("arrival_count, "));
-  fprintf(fp, ("number_of_collisions, "));
-  fprintf(fp, ("attempt_count, "));
-  fprintf(fp, ("number_of_packets_processed, "));
+  fprintf(fp, ("Mean Delay, "));
 
   fprintf(fp, "\n");
   fclose(fp);
@@ -88,17 +85,12 @@ int main(void)
       for_avg_acc.end_time = 0;
       for_avg_acc.tpt = 0;
       for_avg_acc.g = 0;
+      for_avg_acc.attempt_count = 0;
       
       int j = 0;
       /* Do a new simulation_run for each random number generator seed. */
-#ifdef USE_RAND_FOR
-      for (int i_rand = 0 ; i_rand < sizeof(RANDOM_SEEDS) / sizeof(unsigned) - 1;i_rand++)
-      {
-          random_seed = RANDOM_SEEDS[i_rand];
-#else
       while ((random_seed = RANDOM_SEEDS[j++]) != 0)
       {
-#endif
         /* Set the random generator seed. */
         random_generator_initialize(random_seed);
 
@@ -148,19 +140,15 @@ int main(void)
                                           exponential_generator((double)1 / PACKET_ARRIVAL_RATE_LIST[k]));
 
         /* Execute events until we are finished. */
-// #ifdef SIM_TIME_END
-//         while (simulation_run_get_time(simulation_run) < SIM_TIME_END)
-// #else
+
         while (data.number_of_packets_processed < RUNLENGTH)
-//#endif
 
         {
           simulation_run_execute_event(simulation_run);
-          data.g = (double)(data.attempt_count) / (data.end_time - data.init_time);
+          //data.g = (double)(data.attempt_count) / (data.end_time - data.init_time);
         }
 
         data.tpt = (double)data.number_of_packets_processed / (data.end_time - data.init_time);
-        //data.g = (double)(data.arrival_count + data.number_of_collisions) / (data.end_time - data.init_time);
         data.g = (double)(data.attempt_count) / (data.end_time - data.init_time);
         
         for_avg_acc.arrival_count += data.arrival_count;
@@ -169,64 +157,64 @@ int main(void)
         for_avg_acc.accumulated_delay += data.accumulated_delay;
         for_avg_acc.tpt += data.tpt;
         for_avg_acc.g += data.g;
+        for_avg_acc.attempt_count += data.attempt_count;
 
         //assert(data.tpt/(data.g * exp(-2 * data.g))<1.5 && (data.tpt/(data.g * exp(-2 * data.g))<0.67));
 
         printf("seed = %d \n", data.random_seed);
         printf("start time = %f\n", data.init_time);
         printf("end time = %f\n", data.end_time);
+        printf("attempt_count = %d \n", data.attempt_count);
         printf("collisions = %d \n", data.number_of_collisions);
         printf("arrival_count = %d \n", data.arrival_count);
         printf("Throughput = %f \n", data.tpt);
         printf("G = %f \n", data.g);
         printf("number_of_packets_processed = %d \n", data.number_of_packets_processed);
-        printf("attempt_count = %d \n", data.attempt_count);
-        printf("\n");
         /* Print out some results. */
-        output_results(simulation_run);
+        //output_results(simulation_run);
 
-      fp = fopen(data_set_name, "a");
-      //fprintf(fp, ("Number of Stations"));
-      fprintf(fp, "%d, ", NUMBER_OF_STATIONS_LIST[l]);
+      // fp = fopen(data_set_name, "a");
+      // //fprintf(fp, ("Number of Stations"));
+      // fprintf(fp, "%d, ", NUMBER_OF_STATIONS_LIST[l]);
 
-      //fprintf(fp, ("Mean Packet Duration"));
-      fprintf(fp, "%d, ", MEAN_PACKET_DURATION);
+      // //fprintf(fp, ("Mean Packet Duration"));
+      // fprintf(fp, "%d, ", MEAN_PACKET_DURATION);
 
-      //fprintf(fp, ("Packet Arrival Rate"));
-      fprintf(fp, "%f, ", PACKET_ARRIVAL_RATE_LIST[k]);
+      // //fprintf(fp, ("Packet Arrival Rate"));
+      // fprintf(fp, "%f, ", PACKET_ARRIVAL_RATE_LIST[k]);
 
-      //fprintf(fp, ("G"));
-      fprintf(fp, "%f, ", data.g);
+      // //fprintf(fp, ("G"));
+      // fprintf(fp, "%f, ", data.g);
 
-      //fprintf(fp, ("Mean Backoff duration"));
-      fprintf(fp, "%f, ", MEAN_BACKOFF_DURATION_LIST[l]);
+      // //fprintf(fp, ("Mean Backoff duration"));
+      // fprintf(fp, "%f, ", MEAN_BACKOFF_DURATION_LIST[l]);
 
-      //fprintf(fp, ("Number of collision"));
-      fprintf(fp, "%d, ", data.number_of_collisions);
+      // //fprintf(fp, ("Number of collision"));
+      // fprintf(fp, "%d, ", data.number_of_collisions);
 
-      //fprintf(fp, ("Throughput, "));
-      fprintf(fp, "%f, ", data.tpt);
+      // //fprintf(fp, ("Throughput, "));
+      // fprintf(fp, "%f, ", data.tpt);
 
-      //fprintf(fp, ("Mean Delay, "));
-      fprintf(fp, "%f, ", (double)data.accumulated_delay / data.number_of_packets_processed);
+      // //fprintf(fp, ("Mean Delay, "));
+      // fprintf(fp, "%f, ", (double)data.accumulated_delay / data.number_of_packets_processed);
 
-      //fprintf(fp, ("Theo Throughput, "));
-      fprintf(fp, "%f, ", data.g * exp(-2 * data.g));
+      // //fprintf(fp, ("Theo Throughput, "));
+      // fprintf(fp, "%f, ", data.g * exp(-2 * data.g));
       
-      //fprintf(fp, ("arrival_count, "));
-      fprintf(fp, "%d, ", data.arrival_count);
+      // //fprintf(fp, ("arrival_count, "));
+      // fprintf(fp, "%d, ", data.arrival_count);
 
-      //fprintf(fp, ("number_of_collisions, "));
-      fprintf(fp, "%d, ", data.number_of_collisions);
+      // //fprintf(fp, ("number_of_collisions, "));
+      // fprintf(fp, "%d, ", data.number_of_collisions);
 
-      //fprintf(fp, ("attempt_count, "));
-      fprintf(fp, "%d, ", data.attempt_count);
+      // //fprintf(fp, ("attempt_count, "));
+      // fprintf(fp, "%d, ", data.attempt_count);
 
-      //fprintf(fp, ("number_of_packets_processed, "));
-      fprintf(fp, "%d, ", data.number_of_packets_processed);
+      // //fprintf(fp, ("number_of_packets_processed, "));
+      // fprintf(fp, "%d, ", data.number_of_packets_processed);
 
-      fprintf(fp, "\n");
-      fclose(fp);
+      // fprintf(fp, "\n");
+      // fclose(fp);
         /* Clean up memory. */
         cleanup(simulation_run);
       }
@@ -239,35 +227,42 @@ int main(void)
       for_avg_acc.end_time /= size_rand_seed;
       for_avg_acc.tpt /= size_rand_seed;
       for_avg_acc.g /= size_rand_seed;
+      for_avg_acc.attempt_count /= size_rand_seed;
       fp = fopen(data_set_name, "a");
       //cell/element name/type
 
-      ////fprintf(fp, ("Number of Stations"));
-      //fprintf(fp, "%d, ", NUMBER_OF_STATIONS_LIST[l]);
-//
-      ////fprintf(fp, ("Mean Packet Duration"));
-      //fprintf(fp, "%d, ", MEAN_PACKET_DURATION);
-//
-      ////fprintf(fp, ("Packet Arrival Rate"));
-      //fprintf(fp, "%f, ", PACKET_ARRIVAL_RATE_LIST[k]);
-//
-      ////fprintf(fp, ("G"));
-      //fprintf(fp, "%f, ", for_avg_acc.g);
-//
-      ////fprintf(fp, ("Mean Backoff duration"));
-      //fprintf(fp, "%f, ", MEAN_BACKOFF_DURATION_LIST[l]);
-//
-      ////fprintf(fp, ("Number of collision"));
-      //fprintf(fp, "%d, ", for_avg_acc.number_of_collisions);
-//
-      ////fprintf(fp, ("Throughput, "));
-      //fprintf(fp, "%f, ", for_avg_acc.tpt);
-//
-      ////fprintf(fp, ("Mean Delay, "));
-      //fprintf(fp, "%f, ", (double)for_avg_acc.accumulated_delay / for_avg_acc.number_of_packets_processed);
+      //fprintf(fp, ("Number of Stations"));
+      fprintf(fp, "%d, ", NUMBER_OF_STATIONS_LIST[l]);
 
-      //fprintf(fp, "\n");
-      //fclose(fp);
+      //fprintf(fp, ("Mean Packet Duration"));
+      fprintf(fp, "%d, ", MEAN_PACKET_DURATION);
+
+      //fprintf(fp, ("Packet Arrival Rate"));
+      fprintf(fp, "%f, ", PACKET_ARRIVAL_RATE_LIST[k]);
+
+      //fprintf(fp, ("Attempts, "));
+      fprintf(fp, "%d, ", for_avg_acc.attempt_count);
+
+      //fprintf(fp, ("G"));
+      fprintf(fp, "%f, ", for_avg_acc.g);
+
+      //fprintf(fp, ("Mean Backoff duration"));
+      fprintf(fp, "%f, ", MEAN_BACKOFF_DURATION_LIST[l]);
+
+      //fprintf(fp, ("Number of collision"));
+      fprintf(fp, "%d, ", for_avg_acc.number_of_collisions);
+
+      //fprintf(fp, ("Throughput, "));
+      fprintf(fp, "%f, ", for_avg_acc.tpt);
+
+      //fprintf(fp, ("Theo Throughput, "));
+      fprintf(fp, "%f, ", for_avg_acc.g * exp(-2 * for_avg_acc.g));
+
+      //fprintf(fp, ("Mean Delay, "));
+      fprintf(fp, "%f, ", (double)for_avg_acc.accumulated_delay / for_avg_acc.number_of_packets_processed);
+
+      fprintf(fp, "\n");
+      fclose(fp);
 
       //assert(for_avg_acc.tpt/for_avg_acc.g * exp(-2 * for_avg_acc.g)
 
@@ -276,6 +271,7 @@ int main(void)
       printf("Number of Stations = %d \n", NUMBER_OF_STATIONS_LIST[l]);
       printf("Packet Arrival Rate = %f \n", PACKET_ARRIVAL_RATE_LIST[k]);
       printf("G = %f \n", for_avg_acc.g);
+      printf("Attempts = %d \n", for_avg_acc.attempt_count);
       printf("Packet duration = %d \n", MEAN_PACKET_DURATION);
       printf("Mean Backoff duration = %f \n", MEAN_BACKOFF_DURATION_LIST[l]);
       printf("Throughput = %f \n", for_avg_acc.tpt);
@@ -286,7 +282,5 @@ int main(void)
       printf("\n");
     }
   }
-
-  
   return 0;
 }

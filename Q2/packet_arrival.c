@@ -88,10 +88,7 @@ void packet_arrival_event(Simulation_Run_Ptr simulation_run, void *dummy_ptr)
     /* Transmit the packet. */
     schedule_transmission_start_event(simulation_run, now, (void *)new_packet);
   }
-  if (data->arrival_count < RUNLENGTH)
-  {
-    /* Schedule the next packet arrival. */
-    schedule_packet_arrival_event(simulation_run,
-                                  now + exponential_generator((double)1 / data->arrival_rate));
-  }
+  /* Schedule the next packet arrival. */
+  schedule_packet_arrival_event(simulation_run,
+                                now + exponential_generator((double)1 / data->arrival_rate));
 }
