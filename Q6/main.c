@@ -72,7 +72,9 @@ int main(void)
   fprintf(fp, ("number_of_collisions,"));
   fprintf(fp, ("G_per_X,"));
   fprintf(fp, ("theo_throughput,"));
-
+  fprintf(fp, ("MINI_SLOT_DURATION_LIST,"));
+  fprintf(fp, ("MINI_SLOT_M_LIST,"));
+      
   fprintf(fp, "\n");
   fclose(fp);
   for (int l = 0; l < (sizeof(MEAN_BACKOFF_DURATION_LIST) / sizeof(double)); l++)
@@ -226,6 +228,12 @@ int main(void)
 
       //fprintf(fp, ("theo_throughput"));
       fprintf(fp, "%f, ", for_avg_acc.G_per_X * exp(-1*for_avg_acc.G_per_X));
+
+      //fprintf(fp, ("MINI_SLOT_DURATION_LIST"));
+      fprintf(fp, "%f, ", MINI_SLOT_DURATION_LIST[l]);
+
+      //fprintf(fp, ("MINI_SLOT_M_LIST"));
+      fprintf(fp, "%f, ", MINI_SLOT_M_LIST[l]);
 
       fprintf(fp, "\n");
       fclose(fp);
